@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C3022ECE-9FC4-4F50-8EDB-85532F6ADC8B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BCA05EEC-6025-4CE7-8428-3E469E7BB9DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schrodinger.Indexer.Plugin", "src\Schrodinger.Indexer.Plugin\Schrodinger.Indexer.Plugin.csproj", "{526BC4AF-E462-4343-B404-19DEDE2747CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schrodinger.Indexer.TestBase", "test\Schrodinger.Indexer.TestBase\Schrodinger.Indexer.TestBase.csproj", "{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schrodinger.Indexer.Orleans.TestBase", "test\Schrodinger.Indexer.Orleans.TestBase\Schrodinger.Indexer.Orleans.TestBase.csproj", "{887B7B39-AA87-4536-8B86-66ACC716611D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schrodinger.Indexer.Plugin.Tests", "test\Schrodinger.Indexer.Plugin.Tests\Schrodinger.Indexer.Plugin.Tests.csproj", "{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{526BC4AF-E462-4343-B404-19DEDE2747CE} = {C3022ECE-9FC4-4F50-8EDB-85532F6ADC8B}
+		{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6} = {BCA05EEC-6025-4CE7-8428-3E469E7BB9DA}
+		{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16} = {BCA05EEC-6025-4CE7-8428-3E469E7BB9DA}
+		{887B7B39-AA87-4536-8B86-66ACC716611D} = {BCA05EEC-6025-4CE7-8428-3E469E7BB9DA}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{526BC4AF-E462-4343-B404-19DEDE2747CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{526BC4AF-E462-4343-B404-19DEDE2747CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{526BC4AF-E462-4343-B404-19DEDE2747CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{526BC4AF-E462-4343-B404-19DEDE2747CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FC0DE80-48FE-49A6-8DCA-A890AEED37E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{887B7B39-AA87-4536-8B86-66ACC716611D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{887B7B39-AA87-4536-8B86-66ACC716611D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{887B7B39-AA87-4536-8B86-66ACC716611D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{887B7B39-AA87-4536-8B86-66ACC716611D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A51228C-A5C9-4344-AA3A-EBDCD93B5C16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
