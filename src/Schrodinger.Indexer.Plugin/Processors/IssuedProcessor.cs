@@ -16,6 +16,8 @@ namespace Schrodinger.Indexer.Plugin.Processors;
 public class IssuedProcessor : TokenProcessorBase<Issued>
 {
     private readonly ISchrodingerHolderDailyChangeProvider _schrodingerHolderDailyChangeProvider;
+    private readonly IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo>
+        _traitsCountIndexRepository;
     
     public IssuedProcessor(ILogger<TokenProcessorBase<Issued>> logger,
         IObjectMapper objectMapper, IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
@@ -23,10 +25,12 @@ public class IssuedProcessor : TokenProcessorBase<Issued>
         IAElfIndexerClientEntityRepository<SchrodingerIndex, LogEventInfo> schrodingerRepository,
         IAElfIndexerClientEntityRepository<SchrodingerTraitValueIndex, LogEventInfo> schrodingerTraitValueRepository,
         IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> schrodingerSymbolRepository,
-        ISchrodingerHolderDailyChangeProvider schrodingerHolderDailyChangeProvider)
+        ISchrodingerHolderDailyChangeProvider schrodingerHolderDailyChangeProvider,
+        IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitsCountIndexRepository)
         : base(logger, objectMapper, contractInfoOptions, schrodingerHolderRepository, schrodingerRepository, schrodingerTraitValueRepository, schrodingerSymbolRepository)
     {
-        _schrodingerHolderDailyChangeProvider = schrodingerHolderDailyChangeProvider; 
+        _schrodingerHolderDailyChangeProvider = schrodingerHolderDailyChangeProvider;
+        _traitsCountIndexRepository = traitsCountIndexRepository;
     }
     
     protected override async Task HandleEventAsync(Issued eventValue, LogEventContext context)
