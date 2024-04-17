@@ -4,7 +4,7 @@ namespace Schrodinger.Indexer.Plugin.Entities;
 
 public class GenerationCountIndex : SchrodingerIndexerEntity<string>, IIndexBuild
 {
-    public int Gen { get; set; }
+    public int Generation { get; set; }
     public long Count { get; set; }
     
     public long CreateTime { get; set; }

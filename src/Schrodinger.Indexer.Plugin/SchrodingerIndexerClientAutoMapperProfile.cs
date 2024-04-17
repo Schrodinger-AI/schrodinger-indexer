@@ -180,5 +180,8 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<LogEventContext, SwapLPIndex>();
         CreateMap<LogEventContext, SwapLPDailyIndex>();
         CreateMap<SwapLPDailyIndex, SwapLPDailyDto>();
+        
+        CreateMap<LogEventContext, TraitsCountIndex>();
+        CreateMap<LogEventContext, GenerationCountIndex>();
     }
 }
