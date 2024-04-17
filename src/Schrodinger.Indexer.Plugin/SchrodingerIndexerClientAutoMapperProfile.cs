@@ -180,6 +180,10 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<LogEventContext, SwapLPDailyIndex>();
         CreateMap<SwapLPDailyIndex, SwapLPDailyDto>();
         
+        CreateMap<LogEventContext, TraitsCountIndex>();
+        CreateMap<TraitsCountIndex, SchrodingerTraitsFilterDto>();
+        CreateMap<TraitsCountIndex.ValueInfo, TraitValueDto>();
+        
         CreateMap<SchrodingerSymbolIndex, AllSchrodingerDto>()
             .ForMember(des => des.InscriptionDeploy, opt
                 => opt.MapFrom(source => source.SchrodingerInfo.InscriptionDeploy))

@@ -33,4 +33,9 @@ public class IdGenerateHelper
     {
         return GetId(chainId, symbol, contractAddress, address, bizDate);
     }
+    
+    public static string GetTraitCountId(string chainId, string trait)
+    {
+        return GetId(chainId, trait);
+    }
 }

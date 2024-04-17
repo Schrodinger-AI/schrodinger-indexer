@@ -7,3 +7,9 @@ public class GetTraitsInput
     public string Address { get; set; }
     public string TraitType { get; set; }
 }
+
+public class GetAllTraitsInput
+{
+    public string ChainId { get; set; }
+    public string TraitType { get; set; }
+}

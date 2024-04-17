@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nest;
 using Newtonsoft.Json;
+using NUglify.Helpers;
 using Orleans;
 using Schrodinger.Indexer.Plugin.Entities;
 using Schrodinger.Indexer.Plugin.GraphQL.Dto;
@@ -323,6 +324,65 @@ public partial class Query
                 GenerationAmount = g.Count()
             }).OrderBy(s => s.GenerationName).ToList();
 
+
+        return new SchrodingerTraitsDto
+        {
+            TraitsFilter = traitsFilter,
+            GenerationFilter = generationFilter
+        };
+    }
+
+
+    [Name("getAllTraits")]
+    public static async Task<SchrodingerTraitsDto> GetAllTraitsAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitValueRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> schrodingerSymbolRepository,
+        [FromServices] IObjectMapper objectMapper,
+        GetAllTraitsInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<TraitsCountIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0))
+        };
+
+        if (!input.TraitType.IsNullOrEmpty())
+        {
+            mustQuery.Add( q => q.Term(i
+                => i.Field(f => f.TraitType).Value(input.TraitType)));
+        }
+        
+        QueryContainer Filter(QueryContainerDescriptor<TraitsCountIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await traitValueRepository.GetListAsync(Filter, skip: 0);
+        
+        List<GenerationDto> generationFilter = new List<GenerationDto>();
+        
+        var traitsFilter = result.Item2.Select(traits => objectMapper.Map<TraitsCountIndex, SchrodingerTraitsFilterDto>(traits)).ToList();
+
+        for (int i = 1; i <= 9; i++)
+        {
+            var traitsCountMustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+            {
+                q => q.Term(i
+                    => i.Field(f => f.SchrodingerInfo.Gen).Value(i)),
+                q => q.LongRange(i
+                    => i.Field(f => f.HolderCount).GreaterThan(0))
+            };
+            QueryContainer traitsCountFilter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+                f.Bool(b => b.Must(traitsCountMustQuery));
+
+            var countResp = await schrodingerSymbolRepository.CountAsync(traitsCountFilter);
+            var generation = new GenerationDto
+            {
+                GenerationName = i,
+                GenerationAmount = (int)countResp.Count
+            };
+            generationFilter.Add(generation);
+        }
 
         return new SchrodingerTraitsDto
         {
