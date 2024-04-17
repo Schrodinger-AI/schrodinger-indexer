@@ -275,6 +275,16 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             Amount = IssuedAmount
         }.ToLogEvent();
     }
+    
+    protected LogEvent IssuedGen9()
+    {
+        return new Issued
+        {
+            Symbol = GEN9Symbol,
+            To = Address.FromBase58(Issuer),
+            Amount = IssuedAmount
+        }.ToLogEvent();
+    }
 
     protected LogEvent Confirmed()
     {
@@ -480,6 +490,78 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             Ancestor = Ancestor,
             Symbol = GEN0Symbol,
             TokenName = GEN1TokenName
+        }.ToLogEvent();
+    }
+    protected LogEvent AdoptedGen1()
+    {
+        return new Adopted()
+        {
+            AdoptId = HashHelper.ComputeFrom(AdoptIdString),
+            Parent = "test",
+            ParentGen = 1,
+            InputAmount = 1,
+            LossAmount = 1,
+            CommissionAmount = 1,
+            OutputAmount = 1,
+            ImageCount = 1,
+            Adopter = Address.FromBase58(Issuer),
+            BlockHeight = 1,
+            Attributes = new Attributes
+            {
+                Data =
+                {
+                    new Attribute
+                    {
+                        TraitType = TraitType1,
+                        Value = TraitValue1
+                    },
+                    new Attribute
+                    {
+                        TraitType = TraitType2,
+                        Value = TraitValue2
+                    }
+                }
+            },
+            Gen = 1,
+            Ancestor = Ancestor,
+            Symbol = GEN1Symbol,
+            TokenName = GEN1TokenName
+        }.ToLogEvent();
+    }
+    protected LogEvent AdoptedGen9()
+    {
+        return new Adopted()
+        {
+            AdoptId = HashHelper.ComputeFrom(AdoptIdString),
+            Parent = "test",
+            ParentGen = 1,
+            InputAmount = 1,
+            LossAmount = 1,
+            CommissionAmount = 1,
+            OutputAmount = 1,
+            ImageCount = 1,
+            Adopter = Address.FromBase58(Issuer),
+            BlockHeight = 1,
+            Attributes = new Attributes
+            {
+                Data =
+                {
+                    new Attribute
+                    {
+                        TraitType = TraitType1,
+                        Value = TraitValue1
+                    },
+                    new Attribute
+                    {
+                        TraitType = TraitType2,
+                        Value = TraitValue2
+                    }
+                }
+            },
+            Gen = 9,
+            Ancestor = Ancestor,
+            Symbol = GEN9Symbol,
+            TokenName = GEN9TokenName
         }.ToLogEvent();
     }
 }

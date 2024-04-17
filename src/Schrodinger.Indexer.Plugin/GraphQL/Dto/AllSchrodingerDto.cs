@@ -15,10 +15,10 @@ public class AllSchrodingerDto
     public string Level { get; set; }
     public string Grade { get; set; }
     public string Star { get; set; }
-    public List<TraitsInfo> Traits { get; set; }
+    public List<TraitInfo> Traits { get; set; }
     public string Rarity { get; set; }
 
-    public class TraitsInfo
+    public class TraitInfo
     {
         public string TraitType { get; set; }
         public string Value { get; set; }

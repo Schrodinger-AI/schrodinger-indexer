@@ -206,7 +206,7 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
             .ForMember(des => des.Rarity, opt
                 => opt.MapFrom(source => source.Rarity))
             .ForMember(des => des.Traits, opt
-                => opt.MapFrom(source => source.Traits.IsNullOrEmpty()?null:source.Traits.Select(item => new SchrodingerDto.TraitsInfo { TraitType = item.TraitType, Value = item.Value }).ToList()))
+                => opt.MapFrom(source => source.Traits.IsNullOrEmpty()?null:source.Traits.Select(item => new AllSchrodingerDto.TraitInfo { TraitType = item.TraitType, Value = item.Value }).ToList()))
             ;
     }
 }

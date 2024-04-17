@@ -6,7 +6,7 @@ public class GetAllSchrodingerListInput
     public string Tick { get; set; }
     public List<TraitsInput> Traits { get; set; }
     public List<int> Generations { get; set; }
-    public List<RarityType> Raritys { get; set; }
+    public List<string> Raritys { get; set; }
     public int SkipCount { get; set; }
     public int MaxResultCount { get; set; }
     public string Keyword { get; set; }
@@ -17,14 +17,4 @@ public class TraitsInput
 {
     public string TraitType { get; set; }
     public List<string> Values { get; set; }
-}
-
-public enum RarityType
-{
-    Diamond,
-    Emerald,
-    Platinum,
-    Gold,
-    Silver,
-    Bronze
 }

@@ -17,15 +17,5 @@ public class SchrodingerSymbolIndex : SchrodingerIndexerEntity<string>, IIndexBu
     [Keyword] public string Level { get; set; }
     [Keyword] public string Grade { get; set; }
     [Keyword] public string Star{ get; set; }
-    public string Rarity { get; set; }
-}
-
-public enum RarityType
-{
-    Diamond,
-    Emerald,
-    Platinum,
-    Gold,
-    Silver,
-    Bronze
+    [Keyword] public string Rarity { get; set; }
 }
