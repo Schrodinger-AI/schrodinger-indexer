@@ -70,7 +70,7 @@ public class TokenCreatedProcessor : TokenProcessorBase<TokenCreated>
             var isGen9 = TokenSymbolHelper.GetIsGen9FromSchrodingerSymbolIndex(symbolIndex);
             if (isGen9)
             {
-                var rank = 0;
+                var rank = 42800;
                 symbolIndex = SetRankRarity(symbolIndex, rank);
             }
 
@@ -101,7 +101,6 @@ public class TokenCreatedProcessor : TokenProcessorBase<TokenCreated>
         symbolIndex.Grade = leaveGradeStar.Split(SchrodingerConstants.RankLevelSegment)[1];
         symbolIndex.Star = leaveGradeStar.Split(SchrodingerConstants.RankLevelSegment)[2];
 
-        symbolIndex.Level = "";
         //get rarity
         symbolIndex.Rarity = LevelConstant.RarityDictionary.TryGetValue(symbolIndex.Level ?? "", out var rarity)
             ? rarity 

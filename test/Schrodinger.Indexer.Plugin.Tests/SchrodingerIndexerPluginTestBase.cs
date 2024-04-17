@@ -31,9 +31,11 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
     protected readonly string CollectionSymbol = "SGR-0";
     protected readonly string GEN0Symbol = "SGR-1";
     protected readonly string GEN1Symbol = "SGR-2";
+    protected readonly string GEN9Symbol = "SGR-9";
     protected readonly string SwapSymbol = "ALP SGR-1-USDT";
     protected readonly string GEN0TokenName = "SGR";
     protected readonly string GEN1TokenName = "SGR-2GEN1";
+    protected readonly string GEN9TokenName = "SGR-9GEN9";
     protected readonly string SwapTokenName = "Awaken SGR-1-USDT LP Token";
     protected readonly string TraitType1 = "traitType1";
     protected readonly string TraitType2 = "traitType2";
@@ -394,6 +396,23 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
         {
             Symbol = GEN1Symbol,
             TokenName = GEN1TokenName,
+            ExternalInfo = new ExternalInfo
+            {
+                Value =
+                {
+                    [NftAttributes] = "[{traitType:\"traitType1\",value:\"traitValue1\"},{traitType:\"traitType2\",value:\"traitValue2\"}]",
+                    [InscriptionImageKey] = InscriptionImage
+                }
+            }
+        }.ToLogEvent();
+    }
+    
+    protected LogEvent TokenCreatedGen9()
+    {
+        return new TokenCreated
+        {
+            Symbol = GEN9Symbol,
+            TokenName = GEN9TokenName,
             ExternalInfo = new ExternalInfo
             {
                 Value =

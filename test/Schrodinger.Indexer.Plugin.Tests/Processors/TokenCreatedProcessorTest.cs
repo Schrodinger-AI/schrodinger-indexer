@@ -130,4 +130,52 @@ public class TokenCreatedProcessorTest : SchrodingerIndexerPluginTestBase
         traitValueIndex2.Value.ShouldBe(TraitValue2);
         traitValueIndex2.SchrodingerCount.ShouldBe(0);
     }
+     [Fact]
+    public async Task HandleEventAsync_Gen9_SideChain_Test()
+    {
+        await MockEventProcess(Deployed(), DeployedLogEventProcessor, SideChainId);
+        await MockEventProcess(TokenCreatedGen9(), TokenCreatedProcessor, SideChainId);
+        
+        var symbolId = IdGenerateHelper.GetId(SideChainId, GEN9Symbol);
+        var symbolIndex = await SchrodingerSymbolRepository.GetFromBlockStateSetAsync(symbolId, SideChainId);
+        symbolIndex.Rank.ShouldBe(42800);
+        symbolIndex.Level.ShouldBe("5");
+        symbolIndex.Grade.ShouldBe("1");
+        symbolIndex.Star.ShouldBe("5");
+        symbolIndex.Rarity.ShouldBe("Bronze");
+        symbolIndex.ShouldNotBeNull();
+        symbolIndex.Symbol.ShouldBe(GEN9Symbol);
+        
+        var traits = symbolIndex.Traits;
+        traits.Count.ShouldBe(2);
+        var trait1 = traits[0];
+        trait1.TraitType.ShouldBe(TraitType1);
+        trait1.Value.ShouldBe(TraitValue1);
+        var trait2 = traits[1];
+        trait2.TraitType.ShouldBe(TraitType2);
+        trait2.Value.ShouldBe(TraitValue2);
+
+        var schrodingerInfo = symbolIndex.SchrodingerInfo;
+        schrodingerInfo.Tick.ShouldBe(Tick);
+        schrodingerInfo.Symbol.ShouldBe(GEN9Symbol);
+        schrodingerInfo.TokenName.ShouldBe(GEN9TokenName);
+        schrodingerInfo.Decimals.ShouldBe(8);
+        schrodingerInfo.Gen.ShouldBe(9);
+        
+        var traitValueId1 = IdGenerateHelper.GetId(SideChainId, Tick, TraitType1, TraitValue1);
+        var traitValueIndex1 = await SchrodingerTraitValueRepository.GetFromBlockStateSetAsync(traitValueId1, SideChainId);
+        traitValueIndex1.ShouldNotBeNull();
+        traitValueIndex1.Tick.ShouldBe(Tick);
+        traitValueIndex1.TraitType.ShouldBe(TraitType1);
+        traitValueIndex1.Value.ShouldBe(TraitValue1);
+        traitValueIndex1.SchrodingerCount.ShouldBe(0);
+        
+        var traitValueId2 = IdGenerateHelper.GetId(SideChainId, Tick, TraitType2, TraitValue2);
+        var traitValueIndex2 = await SchrodingerTraitValueRepository.GetFromBlockStateSetAsync(traitValueId2, SideChainId);
+        traitValueIndex2.ShouldNotBeNull();
+        traitValueIndex2.Tick.ShouldBe(Tick);
+        traitValueIndex2.TraitType.ShouldBe(TraitType2);
+        traitValueIndex2.Value.ShouldBe(TraitValue2);
+        traitValueIndex2.SchrodingerCount.ShouldBe(0);
+    }
 }
