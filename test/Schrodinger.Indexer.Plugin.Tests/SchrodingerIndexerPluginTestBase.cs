@@ -417,7 +417,7 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             {
                 Value =
                 {
-                    [NftAttributes] = "[{traitType:\"traitType1\",value:\"traitValue1\"},{traitType:\"traitType2\",value:\"traitValue2\"}]",
+                    [NftAttributes] = "[{traitType:\"Background\",value:\"Desert Sunrise\"},{traitType:\"Clothes\",value:\"Doraemon\"},{traitType:\"Breed\",value:\"Ragdoll\"},{traitType:\"Ride\",value:\"SUV\"},{traitType:\"Hat\",value:\"Pileus Cap\"},{traitType:\"Mouth\",value:\"Savoring\"},{traitType:\"Zodiac Signs\",value:\"Gemini\"},{traitType:\"Quantum State\",value:\"Wood\"},{traitType:\"Pet\",value:\"Baby Galactic Hedgehog\"},{traitType:\"Eyes\",value:\"Sunglasses\"},{traitType:\"Tail\",value:\"British Shorthair Tail\"}]",
                     [InscriptionImageKey] = InscriptionImage
                 }
             }

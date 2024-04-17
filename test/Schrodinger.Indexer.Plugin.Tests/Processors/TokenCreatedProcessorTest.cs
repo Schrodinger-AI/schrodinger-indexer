@@ -138,22 +138,22 @@ public class TokenCreatedProcessorTest : SchrodingerIndexerPluginTestBase
         
         var symbolId = IdGenerateHelper.GetId(SideChainId, GEN9Symbol);
         var symbolIndex = await SchrodingerSymbolRepository.GetFromBlockStateSetAsync(symbolId, SideChainId);
-        symbolIndex.Rank.ShouldBe(42800);
-        symbolIndex.Level.ShouldBe("5");
+        symbolIndex.Rank.ShouldBe(52092);
+        symbolIndex.Level.ShouldBe("1");
         symbolIndex.Grade.ShouldBe("1");
-        symbolIndex.Star.ShouldBe("5");
+        symbolIndex.Star.ShouldBe("1");
         symbolIndex.Rarity.ShouldBe("Bronze");
         symbolIndex.ShouldNotBeNull();
         symbolIndex.Symbol.ShouldBe(GEN9Symbol);
         
         var traits = symbolIndex.Traits;
-        traits.Count.ShouldBe(2);
+        traits.Count.ShouldBe(11);
         var trait1 = traits[0];
-        trait1.TraitType.ShouldBe(TraitType1);
-        trait1.Value.ShouldBe(TraitValue1);
+        trait1.TraitType.ShouldBe("Background");
+        trait1.Value.ShouldBe("Desert Sunrise");
         var trait2 = traits[1];
-        trait2.TraitType.ShouldBe(TraitType2);
-        trait2.Value.ShouldBe(TraitValue2);
+        trait2.TraitType.ShouldBe("Clothes");
+        trait2.Value.ShouldBe("Doraemon");
 
         var schrodingerInfo = symbolIndex.SchrodingerInfo;
         schrodingerInfo.Tick.ShouldBe(Tick);
@@ -162,20 +162,20 @@ public class TokenCreatedProcessorTest : SchrodingerIndexerPluginTestBase
         schrodingerInfo.Decimals.ShouldBe(8);
         schrodingerInfo.Gen.ShouldBe(9);
         
-        var traitValueId1 = IdGenerateHelper.GetId(SideChainId, Tick, TraitType1, TraitValue1);
+        var traitValueId1 = IdGenerateHelper.GetId(SideChainId, Tick, "Background", "Desert Sunrise");
         var traitValueIndex1 = await SchrodingerTraitValueRepository.GetFromBlockStateSetAsync(traitValueId1, SideChainId);
         traitValueIndex1.ShouldNotBeNull();
         traitValueIndex1.Tick.ShouldBe(Tick);
-        traitValueIndex1.TraitType.ShouldBe(TraitType1);
-        traitValueIndex1.Value.ShouldBe(TraitValue1);
+        traitValueIndex1.TraitType.ShouldBe("Background");
+        traitValueIndex1.Value.ShouldBe("Desert Sunrise");
         traitValueIndex1.SchrodingerCount.ShouldBe(0);
         
-        var traitValueId2 = IdGenerateHelper.GetId(SideChainId, Tick, TraitType2, TraitValue2);
+        var traitValueId2 = IdGenerateHelper.GetId(SideChainId, Tick, "Clothes", "Doraemon");
         var traitValueIndex2 = await SchrodingerTraitValueRepository.GetFromBlockStateSetAsync(traitValueId2, SideChainId);
         traitValueIndex2.ShouldNotBeNull();
         traitValueIndex2.Tick.ShouldBe(Tick);
-        traitValueIndex2.TraitType.ShouldBe(TraitType2);
-        traitValueIndex2.Value.ShouldBe(TraitValue2);
+        traitValueIndex2.TraitType.ShouldBe("Clothes");
+        traitValueIndex2.Value.ShouldBe("Doraemon");
         traitValueIndex2.SchrodingerCount.ShouldBe(0);
     }
 }

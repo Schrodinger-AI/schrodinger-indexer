@@ -26,16 +26,16 @@ public class RankProvider : IRankProvider, ISingletonDependency
     {
         _logger = logger;
         
-        string traitsDataV8Content = File.ReadAllText("../Constants/TraitDataV8.json");
+        string traitsDataV8Content = File.ReadAllText("/Users/yanfeng/Downloads/TraitDataV8.json");
         _traitsDataV8 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(traitsDataV8Content);
         
-        string traitsProbabilityMapContent = File.ReadAllText("../Constants/TraitsProbabilityMap.json");
+        string traitsProbabilityMapContent = File.ReadAllText("/Users/yanfeng/Downloads/TraitsProbabilityMap.json");
         _traitsProbabilityMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(traitsProbabilityMapContent);
         
-        string probabilityGenOneToNineMapContent = File.ReadAllText("/probability-rank-main/src/probability/data/ProbabilityMap.json");
+        string probabilityGenOneToNineMapContent = File.ReadAllText("/Users/yanfeng/Downloads/ProbabilityMap.json");
         _probabilityGenOneToNineMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(probabilityGenOneToNineMapContent);
         
-        string probabilityRankMapContent = File.ReadAllText("/probability-rank-main/src/probability/data/ProbabilityRankMap.json");
+        string probabilityRankMapContent = File.ReadAllText("/Users/yanfeng/Downloads/ProbabilityRankMap.json");
         _probabilityRankMap = JsonConvert.DeserializeObject<List<string>>(probabilityRankMapContent);
     }
 
