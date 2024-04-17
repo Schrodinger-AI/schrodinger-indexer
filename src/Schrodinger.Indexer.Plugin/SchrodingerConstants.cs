@@ -20,4 +20,7 @@ public class SchrodingerConstants
     public const string CrossChainReceived = "CrossChainReceived";
     public const string Burned = "Burned";
     public const string TokenCreated = "TokenCreated";
+    public const int Gen9 = 9;
+    public const string RankLevelSegment = ",";
+
 }
