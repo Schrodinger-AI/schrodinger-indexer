@@ -182,6 +182,7 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<SwapLPDailyIndex, SwapLPDailyDto>();
         
         CreateMap<LogEventContext, TraitsCountIndex>();
-        CreateMap<LogEventContext, GenerationCountIndex>();
+        CreateMap<TraitsCountIndex, SchrodingerTraitsFilterDto>();
+        CreateMap<TraitsCountIndex.ValueInfo, TraitValueDto>();
     }
 }
