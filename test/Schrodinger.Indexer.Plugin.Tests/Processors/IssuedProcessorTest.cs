@@ -160,4 +160,31 @@ public class IssuedProcessorTest : SchrodingerIndexerPluginTestBase
         traitValueIndex2 = await SchrodingerTraitValueRepository.GetFromBlockStateSetAsync(traitValueId2, SideChainId);
         traitValueIndex2.SchrodingerCount.ShouldBe(1);
     }
+    
+    [Fact]
+    public async Task HandleEventAsync_Gen1_SideChain_SymbolIndex_Test()
+    {
+        await MockEventProcess(Deployed(), DeployedLogEventProcessor, SideChainId);
+        await MockEventProcess(TokenCreatedGen1(), TokenCreatedProcessor, SideChainId);
+        await MockEventProcess(IssuedGen1(), IssuedProcessor, SideChainId);
+        
+        var symbolId = IdGenerateHelper.GetId(SideChainId, GEN1Symbol);
+        var symbolIndex = await SchrodingerSymbolRepository.GetFromBlockStateSetAsync(symbolId, SideChainId);
+        symbolIndex.ShouldNotBeNull();
+        symbolIndex.Id.ShouldBe(symbolId);
+        var traits = symbolIndex.Traits;
+        traits.Count.ShouldBe(2);
+        var trait1 = traits[0];
+        trait1.TraitType.ShouldBe(TraitType1);
+        trait1.Value.ShouldBe(TraitValue1);
+        var trait2 = traits[1];
+        trait2.TraitType.ShouldBe(TraitType2);
+        trait2.Value.ShouldBe(TraitValue2);
+        symbolIndex.Amount.ShouldBe(IssuedAmount);
+        var schrodingerInfo = symbolIndex.SchrodingerInfo;
+        schrodingerInfo.Tick.ShouldBe(Tick);
+        schrodingerInfo.Symbol.ShouldBe(GEN1Symbol);
+        schrodingerInfo.TokenName.ShouldBe(GEN1TokenName);
+        
+    }
 }
