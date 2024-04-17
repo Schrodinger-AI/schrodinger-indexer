@@ -279,6 +279,13 @@ public partial class Query
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderRepository,
         GetTraitsInput input)
     {
+        if (input.Address.IsNullOrEmpty())
+        {
+            return new SchrodingerTraitsDto
+            {
+            };
+        }
+
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
         {
             q => q.Term(i
