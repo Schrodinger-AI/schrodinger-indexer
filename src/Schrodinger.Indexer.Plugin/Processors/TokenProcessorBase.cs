@@ -166,13 +166,13 @@ public abstract class TokenProcessorBase<TEvent> : AElfLogEventProcessorBase<TEv
 
         var afterAmount = holderIndex.Amount;
         await SaveIndexAsync(holderIndex, context);
-        await UpdateSymbolHolderAsync(beforeAmount, afterAmount, tokenEventType, chainId, symbol, context);
+        await UpdateSymbolHolderAsync(beforeAmount, afterAmount, tokenEventType, chainId, symbol, context, deltaAmount);
         
         return holderIndex;
     }
 
     protected async Task UpdateSymbolHolderAsync(long beforeAmount, long afterAmount, string tokenEventType,
-        string chainId, string symbol, LogEventContext context)
+        string chainId, string symbol, LogEventContext context, long deltaAmount)
     {
         var symbolId = GetSymbolIndexId(chainId, symbol);
         var symbolIndex = await SchrodingerSymbolRepository.GetFromBlockStateSetAsync(symbolId, chainId);
@@ -199,6 +199,8 @@ public abstract class TokenProcessorBase<TEvent> : AElfLogEventProcessorBase<TEv
         {
             symbolIndex.HolderCount = 0;
         }
+
+        symbolIndex.Amount += deltaAmount;
         await SaveIndexAsync(symbolIndex, context);
     }
     

@@ -5,6 +5,7 @@ using AElf.Contracts.MultiToken;
 using AElfIndexer.Client;
 using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
+using Elasticsearch.Net.Specification.LicenseApi;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -65,6 +66,14 @@ public class TokenCreatedProcessor : TokenProcessorBase<TokenCreated>
                     await GenerateSchrodingerCountAsync(chainId, tick, trait.TraitType, trait.Value, context);
                 }
             }
+
+            var isGen9 = TokenSymbolHelper.GetIsGen9FromSchrodingerSymbolIndex(symbolIndex);
+            if (isGen9)
+            {
+                var rank = 0;
+                symbolIndex = SetRankRarity(symbolIndex, rank);
+            }
+
             await SaveIndexAsync(symbolIndex, context);
             Logger.LogDebug("[TokenCreated] end chainId:{chainId} symbol:{symbol}", chainId, symbol);
         }
@@ -73,5 +82,30 @@ public class TokenCreatedProcessor : TokenProcessorBase<TokenCreated>
             Logger.LogError(e, "[TokenCreated] Exception chainId:{chainId} symbol:{symbol}", chainId, symbol);
             throw;
         }
+    }
+    private static SchrodingerSymbolIndex SetRankRarity(SchrodingerSymbolIndex symbolIndex, int rank)
+    {
+        symbolIndex.Rank = rank;
+        symbolIndex.Level = "";
+        symbolIndex.Grade = "";
+        symbolIndex.Star = "";
+        symbolIndex.Rarity = "";
+        
+        //get level
+        var rankRes = LevelConstant.RankLevelGradeDictionary.TryGetValue(rank.ToString(), out var leaveGradeStar);
+        if (!rankRes)
+        {
+            return symbolIndex;
+        }
+        symbolIndex.Level = leaveGradeStar.Split(SchrodingerConstants.RankLevelSegment)[0];
+        symbolIndex.Grade = leaveGradeStar.Split(SchrodingerConstants.RankLevelSegment)[1];
+        symbolIndex.Star = leaveGradeStar.Split(SchrodingerConstants.RankLevelSegment)[2];
+
+        symbolIndex.Level = "";
+        //get rarity
+        symbolIndex.Rarity = LevelConstant.RarityDictionary.TryGetValue(symbolIndex.Level ?? "", out var rarity)
+            ? rarity 
+            : "";
+        return symbolIndex;
     }
 }

@@ -58,6 +58,19 @@ public class TokenSymbolHelper
         }
     }
     
+    public static bool GetIsGen9FromSchrodingerSymbolIndex(SchrodingerSymbolIndex symbolIndex)
+    {
+        if (symbolIndex == null || symbolIndex.SchrodingerInfo == null) return false;
+        try
+        {
+            return symbolIndex.SchrodingerInfo.Gen == SchrodingerConstants.Gen9;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+    
     public static SchrodingerInfo OfSchrodingerInfo(SchrodingerIndex schrodingerIndex, TokenCreated eventValue, string symbol, string tokenName)
     {
         var externalInfoValue = eventValue.ExternalInfo.Value;
