@@ -82,7 +82,7 @@ public class RankProvider : IRankProvider, ISingletonDependency
                     typeMapped = value;
                 }
                 var typeMappedTrimmed = typeMapped.Trim();
-                var word = GetAGWord(type);
+                var word = GetAGWord(typeMappedTrimmed);
                 var level = GetTraitLevel(typeMappedTrimmed, trait);
                 return word + level;
             }).ToList();
