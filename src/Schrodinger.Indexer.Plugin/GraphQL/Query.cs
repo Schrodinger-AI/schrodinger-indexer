@@ -369,26 +369,31 @@ public partial class Query
         List<GenerationDto> generationFilter = new List<GenerationDto>();
         
         var traitsFilter = result.Item2.Select(traits => objectMapper.Map<TraitsCountIndex, SchrodingerTraitsFilterDto>(traits)).ToList();
-
-        for (int i = 1; i <= 9; i++)
+        
+        for (int i = 0; i < 9; i++)
         {
+            int generation = GenerationEnum.Generations[i];
             var traitsCountMustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
             {
                 q => q.Term(i
-                    => i.Field(f => f.SchrodingerInfo.Gen).Value(i)),
+                    => i.Field(f => f.SchrodingerInfo.Gen).Value(generation)),
                 q => q.LongRange(i
-                    => i.Field(f => f.HolderCount).GreaterThan(0))
+                    => i.Field(f => f.HolderCount).GreaterThan(0)),
+                q => q.Term(i
+                    => i.Field(f => f.ChainId).Value(input.ChainId))
             };
             QueryContainer traitsCountFilter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
                 f.Bool(b => b.Must(traitsCountMustQuery));
-
+        
             var countResp = await schrodingerSymbolRepository.CountAsync(traitsCountFilter);
-            var generation = new GenerationDto
+        
+            var generationDto = new GenerationDto
             {
-                GenerationName = i,
+                GenerationName = generation,
                 GenerationAmount = (int)countResp.Count
             };
-            generationFilter.Add(generation);
+            
+            generationFilter.Add(generationDto);
         }
 
         return new SchrodingerTraitsDto

@@ -196,4 +196,31 @@ public class QueryTest : QueryTestBase
             result.Data[0].Rank.ShouldBe(52092);
         }
     }
+    
+    
+    [Fact]
+    public async Task GetAllTraitstAsync_Test()
+    {
+        // Arrange
+        var issuedProcessorTest = new IssuedProcessorTest();
+        //mock data
+        await issuedProcessorTest.HandleEventAsync_Gen1_MainChain_Test();
+        
+        // Act
+        var traitValueRepository =
+            GetRequiredService<IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo>>();
+        
+        var schrodingerSymbolRepository =
+            GetRequiredService<IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo>>();
+       
+        var result = await Query.GetAllTraitsAsync(traitValueRepository, schrodingerSymbolRepository, ObjectMapper, new GetAllTraitsInput
+        {
+            ChainId = MainChainId,
+        });
+        
+        // Assert
+        result.TraitsFilter.Count.ShouldBe(2);
+        result.GenerationFilter.Count.ShouldBe(9);
+        result.GenerationFilter[0].GenerationAmount.ShouldBe(1);
+    }
 }
