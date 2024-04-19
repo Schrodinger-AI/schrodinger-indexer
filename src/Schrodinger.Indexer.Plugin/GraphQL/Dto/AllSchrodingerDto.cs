@@ -1,8 +1,6 @@
-using Schrodinger.Indexer.Plugin.Entities;
-
 namespace Schrodinger.Indexer.Plugin.GraphQL.Dto;
 
-public class SchrodingerDto
+public class AllSchrodingerDto
 {
     public string Symbol { get; set; }
     public string TokenName { get; set; }
@@ -13,10 +11,14 @@ public class SchrodingerDto
     public string InscriptionDeploy { get; set; }
     public string Adopter { get; set; }
     public long AdoptTime { get; set; }
-    public string Address { get; set; }
+    public int Rank { get; set; }
+    public string Level { get; set; }
+    public string Grade { get; set; }
+    public string Star { get; set; }
+    public List<TraitInfo> Traits { get; set; }
+    public string Rarity { get; set; }
 
-    public List<TraitsInfo> Traits { get; set; }
-    public class TraitsInfo
+    public class TraitInfo
     {
         public string TraitType { get; set; }
         public string Value { get; set; }

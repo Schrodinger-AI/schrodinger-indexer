@@ -173,12 +173,45 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<LogEventContext, SchrodingerHolderDailyChangeIndex>();
         CreateMap<SchrodingerHolderDailyChangeIndex, SchrodingerHolderDailyChangeDto>();
         CreateMap<SchrodingerSymbolIndex, SchrodingerSymbolDto>();
-        
         //swap token
         CreateMap<Awaken.Contracts.Token.TokenCreated, TokenInfoIndex>();
         CreateMap<LogEventContext, TokenInfoIndex>();
         CreateMap<LogEventContext, SwapLPIndex>();
         CreateMap<LogEventContext, SwapLPDailyIndex>();
         CreateMap<SwapLPDailyIndex, SwapLPDailyDto>();
+        
+        CreateMap<LogEventContext, TraitsCountIndex>();
+        CreateMap<LogEventContext, GenerationCountIndex>();
+        CreateMap<TraitsCountIndex, SchrodingerTraitsFilterDto>();
+        CreateMap<TraitsCountIndex.ValueInfo, TraitValueDto>();
+        
+        CreateMap<SchrodingerSymbolIndex, AllSchrodingerDto>()
+            .ForMember(des => des.InscriptionDeploy, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.InscriptionDeploy))
+            .ForMember(des => des.Decimals, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Decimals))
+            .ForMember(des => des.Symbol, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Symbol))
+            .ForMember(des => des.TokenName, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.TokenName))
+            .ForMember(des => des.InscriptionImageUri, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.InscriptionImageUri))
+            .ForMember(des => des.Generation, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Gen))
+            .ForMember(des => des.Amount, opt
+                => opt.MapFrom(source => source.Amount))
+            .ForMember(des => des.Rank, opt
+                => opt.MapFrom(source => source.Rank))
+            .ForMember(des => des.Level, opt
+                => opt.MapFrom(source => source.Level))
+            .ForMember(des => des.Grade, opt
+                => opt.MapFrom(source => source.Grade))
+            .ForMember(des => des.Star, opt
+                => opt.MapFrom(source => source.Star))
+            .ForMember(des => des.Rarity, opt
+                => opt.MapFrom(source => source.Rarity))
+            .ForMember(des => des.Traits, opt
+                => opt.MapFrom(source => source.Traits.IsNullOrEmpty()?null:source.Traits.Select(item => new AllSchrodingerDto.TraitInfo { TraitType = item.TraitType, Value = item.Value }).ToList()))
+            ;
     }
 }

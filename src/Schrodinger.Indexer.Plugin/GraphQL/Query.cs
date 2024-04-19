@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nest;
 using Newtonsoft.Json;
+using NUglify.Helpers;
 using Orleans;
 using Schrodinger.Indexer.Plugin.Entities;
 using Schrodinger.Indexer.Plugin.GraphQL.Dto;
@@ -279,6 +280,13 @@ public partial class Query
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderRepository,
         GetTraitsInput input)
     {
+        if (input.Address.IsNullOrEmpty())
+        {
+            return new SchrodingerTraitsDto
+            {
+            };
+        }
+
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
         {
             q => q.Term(i
@@ -323,6 +331,70 @@ public partial class Query
                 GenerationAmount = g.Count()
             }).OrderBy(s => s.GenerationName).ToList();
 
+
+        return new SchrodingerTraitsDto
+        {
+            TraitsFilter = traitsFilter,
+            GenerationFilter = generationFilter
+        };
+    }
+
+
+    [Name("getAllTraits")]
+    public static async Task<SchrodingerTraitsDto> GetAllTraitsAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitValueRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> schrodingerSymbolRepository,
+        [FromServices] IObjectMapper objectMapper,
+        GetAllTraitsInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<TraitsCountIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0))
+        };
+
+        if (!input.TraitType.IsNullOrEmpty())
+        {
+            mustQuery.Add( q => q.Term(i
+                => i.Field(f => f.TraitType).Value(input.TraitType)));
+        }
+        
+        QueryContainer Filter(QueryContainerDescriptor<TraitsCountIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await traitValueRepository.GetListAsync(Filter, skip: 0);
+        
+        List<GenerationDto> generationFilter = new List<GenerationDto>();
+        
+        var traitsFilter = result.Item2.Select(traits => objectMapper.Map<TraitsCountIndex, SchrodingerTraitsFilterDto>(traits)).ToList();
+        
+        for (int i = 0; i < 9; i++)
+        {
+            int generation = GenerationEnum.Generations[i];
+            var traitsCountMustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+            {
+                q => q.Term(i
+                    => i.Field(f => f.SchrodingerInfo.Gen).Value(generation)),
+                q => q.LongRange(i
+                    => i.Field(f => f.HolderCount).GreaterThan(0)),
+                q => q.Term(i
+                    => i.Field(f => f.ChainId).Value(input.ChainId))
+            };
+            QueryContainer traitsCountFilter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+                f.Bool(b => b.Must(traitsCountMustQuery));
+        
+            var countResp = await schrodingerSymbolRepository.CountAsync(traitsCountFilter);
+        
+            var generationDto = new GenerationDto
+            {
+                GenerationName = generation,
+                GenerationAmount = (int)countResp.Count
+            };
+            
+            generationFilter.Add(generationDto);
+        }
 
         return new SchrodingerTraitsDto
         {
@@ -589,5 +661,136 @@ public partial class Query
         } while (!list.IsNullOrEmpty());
 
         return res;
+    }
+    [Name("getAllSchrodingerList")]
+    public static async Task<AllSchrodingerListDto> GetAllSchrodingerListAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerAdoptIndex, LogEventInfo> adoptRepository,
+        [FromServices] IObjectMapper objectMapper,
+        GetAllSchrodingerListInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0))
+        };
+        
+        if (input.FilterSgr)
+        {
+            mustQuery.Add(q => q.LongRange(i
+                => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)));
+            var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+            {
+                q => q.Prefix(i =>
+                    i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT"))
+            };
+            mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+
+            var mustNot = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+            {
+                q => q.Term(i =>
+                    i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+            };
+            mustQuery.Add(q => q.Bool(b => b.MustNot(mustNot)));
+        }
+        
+        if (!string.IsNullOrEmpty(input.Keyword))
+        {
+            var shouldQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>();
+            shouldQuery.Add(q => q.Term(i => i.Field(f => f.SchrodingerInfo.Symbol).Value(input.Keyword)));
+            shouldQuery.Add(q => q.Term(i => i.Field(f => f.SchrodingerInfo.TokenName).Value(input.Keyword)));
+            mustQuery.Add(q => q.Bool(b => b.Should(shouldQuery)));
+        }
+
+        var shouldTraitsQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>();
+        
+        if (!input.Traits.IsNullOrEmpty())
+        {
+            foreach (var traitsInput in input.Traits)
+            {
+                var shouldMustQuery =
+                    new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>();
+        
+                var shouldMushShouldQuery =
+                    new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>();
+        
+                if (!string.IsNullOrEmpty(traitsInput.TraitType) && traitsInput.Values != null && !traitsInput.Values.IsNullOrEmpty())
+                {
+                    shouldMushShouldQuery.Add(n =>
+                        n.Nested(n => n.Path("Traits").Query(q => 
+                            q.Term(i => i.Field("Traits.traitType").Value(traitsInput.TraitType)))));
+                    shouldMushShouldQuery.Add(n =>
+                        n.Nested(n => n.Path("Traits").Query(q => 
+                            q.Terms(i => i.Field("Traits.value").Terms(traitsInput.Values)))));
+                }
+        
+                shouldMustQuery.Add(q => q.Bool(b => b.Must(shouldMushShouldQuery)));
+        
+                shouldTraitsQuery.Add(q => q.Bool(b => b.Should(shouldMustQuery)));
+            }
+        }
+        
+        if (!input.Generations.IsNullOrEmpty())
+        {
+            mustQuery.Add(q => q.Terms(i => i.Field(f => f.SchrodingerInfo.Gen).Terms(input.Generations)));
+        }
+        
+        if (!input.Raritys.IsNullOrEmpty())
+        {
+            mustQuery.Add(q => q.Terms(i => i.Field(f => f.Rarity).Terms(input.Raritys)));
+        }
+        
+        mustQuery.Add(q => q.Bool(b => b.Should(shouldTraitsQuery)));
+
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await symbolRepository.GetListAsync(Filter, skip: input.SkipCount,
+            limit: input.MaxResultCount, sortType: SortOrder.Descending, sortExp: o => o.BlockTime);
+
+        
+        //query adopt
+        var symbolList = result.Item2.Select(x => x.SchrodingerInfo.Symbol).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+        var adoptMustQuery = new List<Func<QueryContainerDescriptor<SchrodingerAdoptIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.Terms(f 
+                => f.Field(i => i.Symbol).Terms(symbolList))
+        };
+        QueryContainer AdoptFilter(QueryContainerDescriptor<SchrodingerAdoptIndex> f) =>
+            f.Bool(b => b.Must(adoptMustQuery));
+        
+        var adoptResult = await adoptRepository.GetListAsync(AdoptFilter, skip: input.SkipCount, limit: input.MaxResultCount);
+        var adopterDict = adoptResult.Item2
+            .GroupBy(x => x.Symbol)
+            .ToDictionary(g => g.Key, g => g.First().Adopter);
+        var adoptTimeDict = adoptResult.Item2
+            .GroupBy(x => x.Symbol)
+            .ToDictionary(g => g.Key, g => g.First().AdoptTime);
+
+        var response = new AllSchrodingerListDto
+        {
+            TotalCount = result.Item1,
+            Data = objectMapper.Map<List<SchrodingerSymbolIndex>, List<AllSchrodingerDto>>(result.Item2)
+        };
+        
+        foreach (var schrodingerDto in response.Data)
+        {
+            schrodingerDto.AdoptTime = 0;
+            schrodingerDto.Adopter = string.Empty;
+            if (adoptTimeDict.TryGetValue(schrodingerDto.Symbol, out var adoptTime))
+            {
+                schrodingerDto.AdoptTime =  DateTimeHelper.ToUnixTimeMilliseconds(adoptTime);
+            }
+            if (adopterDict.TryGetValue(schrodingerDto.Symbol, out var adopter))
+            {
+                schrodingerDto.Adopter =  adopter ?? string.Empty;
+            }
+        }
+
+        return response;
     }
 }
