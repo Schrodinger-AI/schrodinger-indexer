@@ -18,7 +18,8 @@ public class CrossChainReceivedProcessor : TokenProcessorBase<CrossChainReceived
 {
     private readonly ISchrodingerHolderDailyChangeProvider _schrodingerHolderDailyChangeProvider;
     private readonly IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> _traitsCountIndexRepository;
-
+    private readonly IAElfIndexerClientEntityRepository<GenerationCountIndex, LogEventInfo> _generationCountIndexRepository;
+    
     public CrossChainReceivedProcessor(ILogger<TokenProcessorBase<CrossChainReceived>> logger,
         IObjectMapper objectMapper, IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> schrodingerHolderRepository,
@@ -26,11 +27,13 @@ public class CrossChainReceivedProcessor : TokenProcessorBase<CrossChainReceived
         IAElfIndexerClientEntityRepository<SchrodingerTraitValueIndex, LogEventInfo> schrodingerTraitValueRepository,
         IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> schrodingerSymbolRepository,
         ISchrodingerHolderDailyChangeProvider schrodingerHolderDailyChangeProvider,
-        IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitsCountIndexRepository)
+        IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitsCountIndexRepository,
+        IAElfIndexerClientEntityRepository<GenerationCountIndex, LogEventInfo> generationCountIndexRepository)
         : base(logger, objectMapper, contractInfoOptions, schrodingerHolderRepository, schrodingerRepository, schrodingerTraitValueRepository, schrodingerSymbolRepository)
     {
         _schrodingerHolderDailyChangeProvider = schrodingerHolderDailyChangeProvider;
         _traitsCountIndexRepository = traitsCountIndexRepository;
+        _generationCountIndexRepository = generationCountIndexRepository;
     }
     
     protected override async Task HandleEventAsync(CrossChainReceived eventValue, LogEventContext context)
@@ -81,6 +84,7 @@ public class CrossChainReceivedProcessor : TokenProcessorBase<CrossChainReceived
 
             await AddTraitCountAsync(traitType, traitValue, chainId, context);
         }
+        await UpdateGenerationCountAsync(symbolIndex.SchrodingerInfo.Gen, chainId, context);
     }
     
     private async Task AddTraitCountAsync(string traitType, string traitValue, string chainId, LogEventContext context)
@@ -143,5 +147,32 @@ public class CrossChainReceivedProcessor : TokenProcessorBase<CrossChainReceived
         }
         Logger.LogDebug("[Issued] UpdateTraitCountAsync index:{holderCountBeforeUpdate}", 
             JsonConvert.SerializeObject(traitCountIndex));
+    }
+    
+    private async Task UpdateGenerationCountAsync(int generation, string chainId, LogEventContext context)
+    {
+        var generationCountIndexId = IdGenerateHelper.GetId(chainId, generation);
+        var generationCountIndex = await _generationCountIndexRepository.GetFromBlockStateSetAsync(generationCountIndexId, chainId);
+        var now = DateTimeHelper.GetCurrentTimestamp();
+        if (generationCountIndex == null)
+        {
+            generationCountIndex = new GenerationCountIndex() {
+                Id = generationCountIndexId,
+                Generation = generation,
+                CreateTime = now,
+                UpdateTime = now,
+                Count = 1
+            };
+            
+            ObjectMapper.Map(context, generationCountIndex);
+            await _generationCountIndexRepository.AddOrUpdateAsync(generationCountIndex);
+        }
+        else
+        {
+            generationCountIndex.Count ++;
+            generationCountIndex.UpdateTime = now;
+            ObjectMapper.Map(context, generationCountIndex);
+            await _generationCountIndexRepository.AddOrUpdateAsync(generationCountIndex);
+        }
     }
 }

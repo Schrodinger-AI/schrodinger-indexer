@@ -19,6 +19,8 @@ public class BurnedProcessor : TokenProcessorBase<Burned>
 {
     private readonly ISchrodingerHolderDailyChangeProvider _schrodingerHolderDailyChangeProvider;
     private readonly IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> _traitsCountIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<GenerationCountIndex, LogEventInfo> _generationCountIndexRepository;
+
     public BurnedProcessor(ILogger<TokenProcessorBase<Burned>> logger,
         IObjectMapper objectMapper, IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> schrodingerHolderRepository,
@@ -26,11 +28,13 @@ public class BurnedProcessor : TokenProcessorBase<Burned>
         IAElfIndexerClientEntityRepository<SchrodingerTraitValueIndex, LogEventInfo> schrodingerTraitValueRepository,
         IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> schrodingerSymbolRepository,
         ISchrodingerHolderDailyChangeProvider schrodingerHolderDailyChangeProvider,
-        IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitsCountIndexRepository)
+        IAElfIndexerClientEntityRepository<TraitsCountIndex, LogEventInfo> traitsCountIndexRepository,
+        IAElfIndexerClientEntityRepository<GenerationCountIndex, LogEventInfo> generationCountIndexRepository)
         : base(logger, objectMapper, contractInfoOptions, schrodingerHolderRepository, schrodingerRepository, schrodingerTraitValueRepository, schrodingerSymbolRepository)
     {
         _schrodingerHolderDailyChangeProvider = schrodingerHolderDailyChangeProvider;
         _traitsCountIndexRepository = traitsCountIndexRepository;
+        _generationCountIndexRepository = generationCountIndexRepository;
     }
     
     protected override async Task HandleEventAsync(Burned eventValue, LogEventContext context)
@@ -83,6 +87,8 @@ public class BurnedProcessor : TokenProcessorBase<Burned>
 
             await ReduceTraitCountAsync(traitType, traitValue, chainId, context);
         }
+
+        await ReduceGenerationCountAsync(symbolIndex.SchrodingerInfo.Gen, chainId, context);
     }
     
     private async Task ReduceTraitCountAsync(string traitType, string traitValue, string chainId, LogEventContext context)
@@ -123,5 +129,27 @@ public class BurnedProcessor : TokenProcessorBase<Burned>
         
         Logger.LogDebug("[Issued] UpdateTraitCountAsync index:{holderCountBeforeUpdate}", 
             JsonConvert.SerializeObject(traitCountIndex));
+    }
+    
+    private async Task ReduceGenerationCountAsync(int generation, string chainId, LogEventContext context)
+    {
+        var generationCountIndexId = IdGenerateHelper.GetId(chainId, generation);
+        var generationCountIndex = await _generationCountIndexRepository.GetFromBlockStateSetAsync(generationCountIndexId, chainId);
+        
+        if (generationCountIndex == null)
+        {
+            Logger.LogError( "[Burned] GenerationCountIndex Not Exist, chainId:{chainId} generation:{generation}",  chainId, generation);
+            return;
+        }
+        
+        var now = DateTimeHelper.GetCurrentTimestamp();
+        if (generationCountIndex.Count > 0)
+        {
+            generationCountIndex.Count --;
+        }
+        generationCountIndex.UpdateTime = now;
+        ObjectMapper.Map(context, generationCountIndex);
+        await _generationCountIndexRepository.AddOrUpdateAsync(generationCountIndex);
+        
     }
 }
