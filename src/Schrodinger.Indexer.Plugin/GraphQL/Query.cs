@@ -279,13 +279,6 @@ public partial class Query
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderRepository,
         GetTraitsInput input)
     {
-        if (input.Address.IsNullOrEmpty())
-        {
-            return new SchrodingerTraitsDto
-            {
-            };
-        }
-
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
         {
             q => q.Term(i
@@ -329,8 +322,12 @@ public partial class Query
                 GenerationName = g.Key,
                 GenerationAmount = g.Count()
             }).OrderBy(s => s.GenerationName).ToList();
-
-
+        
+        if (input.Address.IsNullOrEmpty())
+        {
+            generationFilter = generationFilter.Where(x => x.GenerationName > 0).ToList();
+        }
+        
         return new SchrodingerTraitsDto
         {
             TraitsFilter = traitsFilter,
@@ -585,10 +582,10 @@ public partial class Query
         
         do
         {
-            list = (await repository.GetListAsync(filterFunc: filter, skip: skipCount, limit: 5000)).Item2;
+            list = (await repository.GetListAsync(filterFunc: filter, skip: skipCount, limit: 10000)).Item2;
             var count = list.Count;
             res.AddRange(list);
-            if (list.IsNullOrEmpty() || count < 5000)
+            if (list.IsNullOrEmpty() || count < 10000)
             {
                 break;
             }
