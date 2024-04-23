@@ -82,6 +82,19 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
             .ForMember(des => des.Decimals, opt
                 => opt.MapFrom(source => source.SchrodingerInfo.Decimals))
             ;
+        
+        CreateMap<SchrodingerSymbolIndex, SchrodingerDetailDto>()
+            .ForMember(des => des.Symbol, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Symbol))
+            .ForMember(des => des.TokenName, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.TokenName))
+            .ForMember(des => des.InscriptionImageUri, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.InscriptionImageUri))
+            .ForMember(des => des.Generation, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Gen))
+            .ForMember(des => des.Decimals, opt
+                => opt.MapFrom(source => source.SchrodingerInfo.Decimals))
+            ;
 
         CreateMap<Entities.Attribute, TraitInfo>()
             .ForMember(des => des.Value, opt
