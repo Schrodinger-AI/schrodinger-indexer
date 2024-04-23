@@ -56,5 +56,5 @@ public class SchrodingerIndexerPluginModule : AElfIndexerClientPluginBaseModule<
     }
 
     protected override string ClientId => "SchrodingerIndexer_DApp";
-    protected override string Version => "3f74d3bcc7b444929571f4b1c2383e67";
+    protected override string Version => "852c0acc41f242c6bb66d01306566346";
 }

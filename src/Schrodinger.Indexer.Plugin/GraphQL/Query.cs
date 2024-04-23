@@ -208,6 +208,7 @@ public partial class Query
     public static async Task<SchrodingerDetailDto> GetSchrodingerDetailAsync(
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderRepository,
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerTraitValueIndex, LogEventInfo> traitValueRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
         [FromServices] IObjectMapper objectMapper, GetSchrodingerDetailInput input)
     {
         var chainId = input.ChainId;
@@ -215,11 +216,37 @@ public partial class Query
         var tick = TokenSymbolHelper.GetTickBySymbol(symbol);
         var holderId = IdGenerateHelper.GetId(chainId, symbol, input.Address);
         var holderIndex = await holderRepository.GetFromBlockStateSetAsync(holderId, chainId);
+        
+        List<TraitInfo> traitList;
+        SchrodingerDetailDto schrodingerDetailDto;
         if (holderIndex == null || holderIndex.Amount == 0)
         {
-            return new SchrodingerDetailDto();
+            
+            var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+            {
+                q => q.Term(i
+                    => i.Field(f => f.ChainId).Value(input.ChainId)),
+                q => q.Term(i 
+                    => i.Field(f => f.SchrodingerInfo.Symbol).Value(input.Symbol))
+            };
+            
+            QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+                f.Bool(b => b.Must(mustQuery));
+
+            var result = await symbolRepository.GetAsync(Filter);
+            if (result == null)
+            {
+                return new SchrodingerDetailDto();
+            }
+            schrodingerDetailDto = objectMapper.Map<SchrodingerSymbolIndex, SchrodingerDetailDto>(result);
+            traitList = result.Traits;
         }
-        var traitList = holderIndex.Traits;
+        else
+        {
+            schrodingerDetailDto = objectMapper.Map<SchrodingerHolderIndex, SchrodingerDetailDto>(holderIndex);
+            traitList = holderIndex.Traits;
+        }
+        
         var traitTypeList = traitList.Select(x => x.TraitType).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
         var traitTypeValueList = await GetAllIndex(GetTraitTypeValueFilter(tick, traitTypeList), traitValueRepository);
 
@@ -252,8 +279,7 @@ public partial class Query
                 Percent = percent
             });
         }
-
-        var schrodingerDetailDto = objectMapper.Map<SchrodingerHolderIndex, SchrodingerDetailDto>(holderIndex);
+        
         schrodingerDetailDto.Traits = traitListWithPercent;
         return schrodingerDetailDto;
     }
