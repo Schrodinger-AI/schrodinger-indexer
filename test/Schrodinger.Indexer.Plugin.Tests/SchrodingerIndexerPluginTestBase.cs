@@ -31,9 +31,11 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
     protected readonly string CollectionSymbol = "SGR-0";
     protected readonly string GEN0Symbol = "SGR-1";
     protected readonly string GEN1Symbol = "SGR-2";
+    protected readonly string GEN9Symbol = "SGR-9";
     protected readonly string SwapSymbol = "ALP SGR-1-USDT";
     protected readonly string GEN0TokenName = "SGR";
     protected readonly string GEN1TokenName = "SGR-2GEN1";
+    protected readonly string GEN9TokenName = "SGR-9GEN9";
     protected readonly string SwapTokenName = "Awaken SGR-1-USDT LP Token";
     protected readonly string TraitType1 = "traitType1";
     protected readonly string TraitType2 = "traitType2";
@@ -273,6 +275,16 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             Amount = IssuedAmount
         }.ToLogEvent();
     }
+    
+    protected LogEvent IssuedGen9()
+    {
+        return new Issued
+        {
+            Symbol = GEN9Symbol,
+            To = Address.FromBase58(Issuer),
+            Amount = IssuedAmount
+        }.ToLogEvent();
+    }
 
     protected LogEvent Confirmed()
     {
@@ -404,6 +416,23 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             }
         }.ToLogEvent();
     }
+    
+    protected LogEvent TokenCreatedGen9()
+    {
+        return new TokenCreated
+        {
+            Symbol = GEN9Symbol,
+            TokenName = GEN9TokenName,
+            ExternalInfo = new ExternalInfo
+            {
+                Value =
+                {
+                    [NftAttributes] = "[{traitType:\"Background\",value:\"Desert Sunrise\"},{traitType:\"Clothes\",value:\"Doraemon\"},{traitType:\"Breed\",value:\"Ragdoll\"},{traitType:\"Ride\",value:\"SUV\"},{traitType:\"Hat\",value:\"Pileus Cap\"},{traitType:\"Mouth\",value:\"Savoring\"},{traitType:\"Zodiac Signs\",value:\"Gemini\"},{traitType:\"Quantum State\",value:\"Wood\"},{traitType:\"Pet\",value:\"Baby Galactic Hedgehog\"},{traitType:\"Eyes\",value:\"Sunglasses\"},{traitType:\"Tail\",value:\"British Shorthair Tail\"}]",
+                    [InscriptionImageKey] = InscriptionImage
+                }
+            }
+        }.ToLogEvent();
+    }
 
     protected LogEvent CrossChainReceivedGen0()
     {
@@ -461,6 +490,78 @@ public abstract class SchrodingerIndexerPluginTestBase : SchrodingerIndexerOrlea
             Ancestor = Ancestor,
             Symbol = GEN0Symbol,
             TokenName = GEN1TokenName
+        }.ToLogEvent();
+    }
+    protected LogEvent AdoptedGen1()
+    {
+        return new Adopted()
+        {
+            AdoptId = HashHelper.ComputeFrom(AdoptIdString),
+            Parent = "test",
+            ParentGen = 1,
+            InputAmount = 1,
+            LossAmount = 1,
+            CommissionAmount = 1,
+            OutputAmount = 1,
+            ImageCount = 1,
+            Adopter = Address.FromBase58(Issuer),
+            BlockHeight = 1,
+            Attributes = new Attributes
+            {
+                Data =
+                {
+                    new Attribute
+                    {
+                        TraitType = TraitType1,
+                        Value = TraitValue1
+                    },
+                    new Attribute
+                    {
+                        TraitType = TraitType2,
+                        Value = TraitValue2
+                    }
+                }
+            },
+            Gen = 1,
+            Ancestor = Ancestor,
+            Symbol = GEN1Symbol,
+            TokenName = GEN1TokenName
+        }.ToLogEvent();
+    }
+    protected LogEvent AdoptedGen9()
+    {
+        return new Adopted()
+        {
+            AdoptId = HashHelper.ComputeFrom(AdoptIdString),
+            Parent = "test",
+            ParentGen = 1,
+            InputAmount = 1,
+            LossAmount = 1,
+            CommissionAmount = 1,
+            OutputAmount = 1,
+            ImageCount = 1,
+            Adopter = Address.FromBase58(Issuer),
+            BlockHeight = 1,
+            Attributes = new Attributes
+            {
+                Data =
+                {
+                    new Attribute
+                    {
+                        TraitType = TraitType1,
+                        Value = TraitValue1
+                    },
+                    new Attribute
+                    {
+                        TraitType = TraitType2,
+                        Value = TraitValue2
+                    }
+                }
+            },
+            Gen = 9,
+            Ancestor = Ancestor,
+            Symbol = GEN9Symbol,
+            TokenName = GEN9TokenName
         }.ToLogEvent();
     }
 }

@@ -27,6 +27,11 @@ public static class DateTimeHelper
     {
         return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
     }
+    
+    public static long GetCurrentTimestamp()
+    {
+        return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+    }
 
     public static DateTime FromUnixTimeSeconds(long value)
     {
