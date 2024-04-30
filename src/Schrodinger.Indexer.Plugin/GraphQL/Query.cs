@@ -535,11 +535,37 @@ public partial class Query
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderDailyChangeIndex>, QueryContainer>>
         {
             q => q.Term(i
-                => i.Field(f => f.ChainId).Value(input.ChainId)),
-            q => q.Term(i
-                => i.Field(f => f.Date).Value(input.Date))
+                => i.Field(f => f.ChainId).Value(input.ChainId))
         };
+        
+        if (!input.Date.IsNullOrEmpty())
+        {
+            mustQuery.Add( q => q.Term(i
+                => i.Field(f => f.Date).Value(input.Date)));
+        }
+        
+        if (!input.Address.IsNullOrEmpty())
+        {
+            mustQuery.Add( q => q.Term(i
+                => i.Field(f => f.Address).Value(input.Address)));
+        }
+        
+        if (!input.Symbol.IsNullOrEmpty())
+        {
+            mustQuery.Add( q => q.Term(i
+                => i.Field(f => f.Symbol).Value(input.Symbol)));
+        }
 
+        if (!input.ExcludeDate.IsNullOrEmpty())
+        {
+            var mustNot = new List<Func<QueryContainerDescriptor<SchrodingerHolderDailyChangeIndex>, QueryContainer>>
+            {
+                q => q.Terms(i =>
+                    i.Field(f => f.Date).Terms(input.ExcludeDate))
+            };
+            mustQuery.Add(q => q.Bool(b => b.MustNot(mustNot)));
+        }
+        
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderDailyChangeIndex> f) =>
             f.Bool(b => b.Must(mustQuery));
 
