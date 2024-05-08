@@ -17,8 +17,6 @@ public class SoldLogEventProcessor : AElfLogEventProcessorBase<Sold, LogEventInf
     private readonly ContractInfoOptions _contractInfoOptions;
     private readonly ILogger<AElfLogEventProcessorBase<Sold, LogEventInfo>> _logger;
     private readonly INFTActivityProvider _nftActivityProvider;
-    private const int Decimal = 8;
-
 
     public SoldLogEventProcessor(
         ILogger<AElfLogEventProcessorBase<Sold, LogEventInfo>> logger,
@@ -78,7 +76,7 @@ public class SoldLogEventProcessor : AElfLogEventProcessorBase<Sold, LogEventInf
             Type = NFTActivityType.Sale,
             From = FullAddressHelper.ToFullAddress(eventValue.NftFrom.ToBase58(), context.ChainId),
             To = FullAddressHelper.ToFullAddress(eventValue.NftTo.ToBase58(), context.ChainId),
-            Amount = TokenHelper.GetIntegerDivision(eventValue.NftQuantity, Decimal),
+            Amount = TokenHelper.GetIntegerDivision(eventValue.NftQuantity, TokenHelper.GetDecimal(eventValue.NftSymbol)),
             Price = singlePrice,
             TransactionHash = context.TransactionId,
             Timestamp = context.BlockTime,

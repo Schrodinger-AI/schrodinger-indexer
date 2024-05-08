@@ -4,6 +4,7 @@ using AElfIndexer.Grains.State.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Schrodinger.Indexer.Plugin.GraphQL;
 using Schrodinger.Indexer.Plugin.Processors;
+using Schrodinger.Indexer.Plugin.Processors.Forest;
 using Schrodinger.Indexer.Plugin.Processors.SwapToken;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
@@ -52,6 +53,7 @@ public class SchrodingerIndexerPluginModule : AElfIndexerClientPluginBaseModule<
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, TokenTransferredLogEventProcessor3>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, TokenTransferredLogEventProcessor4>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, TokenTransferredLogEventProcessor5>();
+        serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, SoldLogEventProcessor>();
         
     }
 
