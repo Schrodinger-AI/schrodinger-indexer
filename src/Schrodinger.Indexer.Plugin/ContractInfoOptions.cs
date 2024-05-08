@@ -19,6 +19,8 @@ public class ContractInfo
     public string TokenContractAddress { get; set; }
     
     public string SwapTokenContractAddress { get; set; }
+
+    public string NFTMarketContractAddress { get; set; }
     
     public int Level { get; set; }
 }
