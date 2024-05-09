@@ -19,7 +19,7 @@ public class QueryTest : QueryTestBase
         await MockEventProcess(TokenCreatedGen1(), TokenCreatedProcessor, SideChainId);
         await MockEventProcess(IssuedGen1(), IssuedProcessor, SideChainId);
 
-        await Query.GetSchrodingerDetailAsync(SchrodingerHolderRepository, SchrodingerTraitValueRepository, ObjectMapper, new GetSchrodingerDetailInput
+        await Query.GetSchrodingerDetailAsync(SchrodingerHolderRepository, SchrodingerTraitValueRepository, SchrodingerSymbolRepository, ObjectMapper, new GetSchrodingerDetailInput
         {
             ChainId = SideChainId,
             Address = Issuer,
@@ -222,5 +222,30 @@ public class QueryTest : QueryTestBase
         result.TraitsFilter.Count.ShouldBe(2);
         result.GenerationFilter.Count.ShouldBe(9);
         result.GenerationFilter[0].GenerationAmount.ShouldBe(1);
+    }
+    
+    [Fact]
+    public async Task GetSchrodingerSoldRecordAsync_Test()
+    {
+        // Arrange
+        var soldLogProcessorTest = new SoldLogEventProcessorTests();
+        //mock data
+        await soldLogProcessorTest.SoldProcessAsyncTest();
+        
+        // Act
+        var _nftActivityIndexRepository =
+            GetRequiredService<IAElfIndexerClientEntityRepository<NFTActivityIndex, LogEventInfo>>();
+       
+        var result = await Query.GetSchrodingerSoldRecordAsync(_nftActivityIndexRepository,  new GetSchrodingerSoldRecordInput
+        {
+            Types = new List<int>(){3},
+            SortType = "DESC",
+            Address = "ELF_2YcGvyn7QPmhvrZ7aaymmb2MDYWhmAks356nV3kUwL8FkGSYeZ_tDVW",
+            TimestampMin = 1620172800000
+        }, ObjectMapper);
+        
+        // Assert
+        result.TotalRecordCount.ShouldBe(1);
+        result.Data.Count.ShouldBe(1);
     }
 }

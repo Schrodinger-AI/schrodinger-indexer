@@ -38,4 +38,14 @@ public class IdGenerateHelper
     {
         return GetId(chainId, trait);
     }
+    
+    public static string GetNFTInfoId(string chainId, string symbol)
+    {
+        return GetId(chainId, symbol);
+    }
+    
+    public static string GetSeedSymbolId(string chainId, string symbol)
+    {
+        return GetId(chainId, symbol);
+    }
 }
