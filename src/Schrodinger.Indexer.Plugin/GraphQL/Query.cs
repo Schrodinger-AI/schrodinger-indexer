@@ -711,6 +711,7 @@ public partial class Query
 
         return res;
     }
+    
     [Name("getAllSchrodingerList")]
     public static async Task<AllSchrodingerListDto> GetAllSchrodingerListAsync(
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
@@ -873,6 +874,14 @@ public partial class Query
             mustQuery.Add(q => q.Term(i => i.Field(f => f.From).Value(input.Address)));
         }
 
+        var baseToken = input.ChainId + "-" + input.FilterSymbol + "-1";
+        var mustNotQuery = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.NftInfoId).Value(baseToken))
+        };
+        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+
         QueryContainer Filter(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery));
 
         var list = await _nftActivityIndexRepository.GetSortListAsync(Filter, limit: input.MaxResultCount,
@@ -898,6 +907,37 @@ public partial class Query
 
         IPromise<IList<ISort>> promise = sortDescriptor;
         return s => promise;
-    } 
-    
+    }
+
+
+    [Name("getSchrodingerRank")]
+    public static async Task<SchrodingerRankDto> GetSchrodingerRankAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerAdoptIndex, LogEventInfo> adoptRepository,
+        [FromServices] IObjectMapper objectMapper,
+        GetSchrodingerRankInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.Term(i
+                => i.Field(f => f.Symbol).Value(input.Symbol))
+        };
+
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await symbolRepository.GetAsync(Filter);
+        if (result == null)
+        {
+            return new SchrodingerRankDto();
+        }
+
+        var resp = objectMapper.Map<SchrodingerSymbolIndex, SchrodingerRankDto>(result);
+        resp.TokenName = result.SchrodingerInfo.TokenName;
+        resp.InscriptionImageUri = result.SchrodingerInfo.InscriptionImageUri;
+        resp.Generation = result.SchrodingerInfo.Gen;
+        return resp;
+    }
 }
