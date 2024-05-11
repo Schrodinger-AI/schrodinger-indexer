@@ -11,4 +11,6 @@ public class GetSchrodingerSoldRecordInput : PagedResultRequestDto
     
     public string Address { get; set; }
     public string FilterSymbol { get; set; }
+    
+    public string ChainId { get; set; }
 }

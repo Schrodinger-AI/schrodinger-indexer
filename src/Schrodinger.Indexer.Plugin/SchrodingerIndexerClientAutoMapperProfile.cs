@@ -200,6 +200,7 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<LogEventContext, GenerationCountIndex>();
         CreateMap<TraitsCountIndex, SchrodingerTraitsFilterDto>();
         CreateMap<TraitsCountIndex.ValueInfo, TraitValueDto>();
+        CreateMap<SchrodingerSymbolIndex, SchrodingerRankDto>();
         
         CreateMap<SchrodingerSymbolIndex, AllSchrodingerDto>()
             .ForMember(des => des.InscriptionDeploy, opt
