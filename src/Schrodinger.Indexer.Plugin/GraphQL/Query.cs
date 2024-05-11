@@ -874,14 +874,6 @@ public partial class Query
             mustQuery.Add(q => q.Term(i => i.Field(f => f.From).Value(input.Address)));
         }
 
-        var baseToken = input.ChainId + "-" + input.FilterSymbol + "-1";
-        var mustNotQuery = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>
-        {
-            q => q.Term(i
-                => i.Field(f => f.NftInfoId).Value(baseToken))
-        };
-        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
-
         QueryContainer Filter(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery));
 
         var list = await _nftActivityIndexRepository.GetSortListAsync(Filter, limit: input.MaxResultCount,
