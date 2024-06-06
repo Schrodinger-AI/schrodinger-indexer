@@ -86,17 +86,18 @@ public partial class Query
                 => i.Field(f => f.Amount).GreaterThan(0))
         };
         
+        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.Prefix(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT"))
+        };
+        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+        
         if (input.FilterSgr)
         {
             mustQuery.Add(q => q.LongRange(i
                 => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)));
-            var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
-            {
-                q => q.Prefix(i =>
-                    i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT"))
-            };
-            mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
-
+           
             var mustNot = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
             {
                 q => q.Term(i =>
