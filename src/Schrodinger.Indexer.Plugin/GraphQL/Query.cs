@@ -933,4 +933,33 @@ public partial class Query
         resp.Generation = result.SchrodingerInfo.Gen;
         return resp;
     }
+    
+    [Name("getAdoptInfoByTime")]
+    public static async Task<List<AdoptInfoDto>> GetAdoptInfoByTimeAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerAdoptIndex, LogEventInfo> repository,
+        [FromServices] IObjectMapper objectMapper,
+        GetAdoptInfoByTimeInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerAdoptIndex>, QueryContainer>>();
+        
+        if (input.BeginTime > 0)
+        {
+            mustQuery.Add(q => q.DateRange(i =>
+                i.Field(f => f.AdoptTime)
+                    .GreaterThanOrEquals(DateTime.UnixEpoch.AddSeconds(input.BeginTime))));
+        }
+        if (input.EndTime > 0)
+        {
+            mustQuery.Add(q => q.DateRange(i =>
+                i.Field(f => f.AdoptTime)
+                    .LessThan(DateTime.UnixEpoch.AddSeconds(input.EndTime))));
+        }
+        
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerAdoptIndex> f) => f.Bool(b => b.Must(mustQuery));
+
+        var result = await GetAllIndex(Filter, repository);
+        
+        return  objectMapper.Map<List<SchrodingerAdoptIndex>, List<AdoptInfoDto>>(result);
+    }
+
 }
