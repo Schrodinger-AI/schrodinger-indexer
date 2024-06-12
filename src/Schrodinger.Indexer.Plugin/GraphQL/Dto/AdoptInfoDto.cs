@@ -27,6 +27,7 @@ public class  AdoptInfoDto
     public int Gen { get; set; }
     public int ParentGen { get; set; }
     public int Decimals { get; set; }
+    public DateTime AdoptTime { get; set; }
 }
 
 public class Trait
