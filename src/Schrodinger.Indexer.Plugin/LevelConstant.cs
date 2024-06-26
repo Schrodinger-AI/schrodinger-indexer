@@ -62728,4 +62728,15 @@ public class LevelConstant
         { "2", "Bronze" },
         { "1", "Bronze" }
     };
+    
+    
+    public static List<string> RarityList = new List<string> 
+    {   
+        "Diamond",
+        "Emerald",
+        "Platinum",
+        "Gold",
+        "Silver",
+        "Bronze"
+    }; 
 }

@@ -907,7 +907,6 @@ public partial class Query
         return s => promise;
     }
 
-
     [Name("getSchrodingerRank")]
     public static async Task<SchrodingerRankDto> GetSchrodingerRankAsync(
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
@@ -966,8 +965,7 @@ public partial class Query
         
         return  objectMapper.Map<List<SchrodingerAdoptIndex>, List<AdoptInfoDto>>(result);
     }
-
-
+    
     private static bool IsRare(string traitType, string traitValue)
     {
         var rareType = new List<string>
@@ -992,12 +990,14 @@ public partial class Query
             "Weapon",
             "Accessory"
         };
-            
+
         string traitsProbabilityMapContent = File.ReadAllText("/app/rankData/TraitDataV8.json");
-        var traitsProbabilityMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(traitsProbabilityMapContent);
+        var traitsProbabilityMap =
+            JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(
+                traitsProbabilityMapContent);
         var traitsProbabilityList = traitsProbabilityMap.ToDictionary(x => x.Key,
             x => x.Value.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).Take(10).ToList());
-       
+
         if (!rareType.Contains(traitType))
         {
             return false;
@@ -1005,5 +1005,212 @@ public partial class Query
 
         var rareValueInType = traitsProbabilityList[traitType];
         return rareValueInType.Contains(traitValue);
+    }
+    
+    
+    [Name("getHoldingRank")]
+    public static async Task<List<RankItem>> GetHoldingRankAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> repository,
+        GetHoldingRankInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0))
+        };
+        
+        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.Prefix(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
+            q => q.Term(i =>
+            i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+            
+        };
+        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+        
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var holderList = await GetAllIndex(Filter, repository);
+
+        var holderRankList = holderList
+            .GroupBy(x => x.Address)
+            .Select(x => new RankItem
+            {
+                Address = x.Key,
+                Amount = x.Sum(y => y.Amount) / (decimal)Math.Pow(10, 8),
+                UpdateTime = x.Max(y => y.BlockTime)
+            }).ToList();
+        
+        holderRankList.Sort((item1, item2) =>
+        { 
+            int scoreComparison = item2.Amount.CompareTo(item1.Amount);
+            if (scoreComparison != 0)
+            {
+                return scoreComparison;
+            }
+
+            int timeComparison = item1.UpdateTime.CompareTo(item2.UpdateTime);
+            return timeComparison;
+        });
+
+        return holderRankList.Take(input.RankNumber).ToList();
+    }
+    
+    
+    [Name("getRarityRank")]
+    public static async Task<List<RarityRankItem>> GetRarityRankAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderIndexRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolIndexRepository,
+        GetHoldingRankInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0)),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.Gen).Value(9))
+        };
+        
+        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.Prefix(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+            
+        };
+        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+        
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var holderList = await GetAllIndex(Filter, holderIndexRepository);
+  
+        var mustQueryOfSymbolIndex = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.Terms(i
+                => i.Field(f => f.Rarity).Terms(LevelConstant.RarityList))
+        };
+        QueryContainer FilterOfSymbolIndex(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+            f.Bool(b => b.Must(mustQueryOfSymbolIndex));
+        var symbolList = await GetAllIndex(FilterOfSymbolIndex, symbolIndexRepository);
+        var rarityDict = symbolList.GroupBy(x => x.Rarity).ToDictionary(g => g.Key, g => g.Select(x => x.Symbol).ToList());
+        
+        var rarityRankItemDict = new Dictionary<string, RarityRankItem>();
+        foreach (var holderInfo in holderList)
+        {
+            var symbol = holderInfo.SchrodingerInfo.Symbol;
+            var rarity = GetRarity(rarityDict, symbol);
+            if (rarity.IsNullOrEmpty())
+            {
+                continue;
+            }
+            
+            var address = holderInfo.Address;
+            if (rarityRankItemDict.TryGetValue(address, out var rarityRankItem))
+            {
+                rarityRankItemDict[address] = SetRarityRankItem(rarity, holderInfo.Amount, holderInfo.BlockTime, rarityRankItem);
+            }
+            else
+            {
+                rarityRankItem = new RarityRankItem
+                {
+                    Address = address
+                };
+                rarityRankItemDict[address] = SetRarityRankItem(rarity, holderInfo.Amount, holderInfo.BlockTime, rarityRankItem);
+            }
+        }
+
+        var rarityRankItemList = rarityRankItemDict.Select(x => x.Value).ToList();
+        rarityRankItemList.Sort((item1, item2) =>
+        {
+            int diamondComparison = item2.Diamond.CompareTo(item1.Diamond);
+            if (diamondComparison != 0)
+            {
+                return diamondComparison;
+            }
+            
+            int emeraldComparison = item2.Emerald.CompareTo(item1.Emerald);
+            if (emeraldComparison != 0)
+            {
+                return emeraldComparison;
+            }
+            
+            int platinumComparison = item2.Platinum.CompareTo(item1.Platinum);
+            if (platinumComparison != 0)
+            {
+                return platinumComparison;
+            }
+            
+            int goldComparison = item2.Gold.CompareTo(item1.Gold);
+            if (goldComparison != 0)
+            {
+                return goldComparison;
+            }
+            
+            int silverComparison = item2.Silver.CompareTo(item1.Silver);
+            if (silverComparison != 0)
+            {
+                return silverComparison;
+            }
+            
+            int bronzeComparison = item2.Bronze.CompareTo(item1.Bronze);
+            if (bronzeComparison != 0)
+            {
+                return bronzeComparison;
+            }
+            
+            int timeComparison = item1.UpdateTime.CompareTo(item2.UpdateTime);
+            return timeComparison;
+        });
+        
+        return rarityRankItemList.Take(input.RankNumber).ToList();
+    }
+
+    private static string GetRarity(Dictionary<string, List<string>> rarityDict, string symbol)
+    {
+        foreach (var item in rarityDict)
+        {
+            if (item.Value.Contains(symbol))
+            {
+                return item.Key;
+            }
+        }
+
+        return "";
+    }
+
+    private static RarityRankItem SetRarityRankItem(string rarity, long amount, DateTime updateTime, RarityRankItem rarityRankItem)
+    {
+        if (updateTime > rarityRankItem.UpdateTime)
+        {
+            rarityRankItem.UpdateTime = updateTime;
+        }
+        
+        var decimals = (decimal)Math.Pow(10, 8);
+        switch (rarity)
+        {
+            case "Diamond":
+                rarityRankItem.Diamond += amount/decimals;
+                break;
+            case "Gold":
+                rarityRankItem.Gold += amount/decimals;
+                break;
+            case "Silver":
+                rarityRankItem.Silver += amount/decimals;
+                break;
+            case "Bronze":
+                rarityRankItem.Bronze += amount/decimals;
+                break;
+            case "Emerald":
+                rarityRankItem.Emerald += amount/decimals;
+                break;
+            case "Platinum":
+                rarityRankItem.Platinum += amount/decimals;
+                break;
+        }
+        return rarityRankItem;
     }
 }
