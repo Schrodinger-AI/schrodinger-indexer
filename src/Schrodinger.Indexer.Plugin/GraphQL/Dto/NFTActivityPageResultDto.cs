@@ -19,3 +19,9 @@ public class NFTActivityDto
     public string TransactionHash { get; set; }
     public DateTime Timestamp { get; set; }
 }
+
+
+public class SchrodingerSoldRecord
+{
+    public List<NFTActivityDto> Data { get; set; }
+}
