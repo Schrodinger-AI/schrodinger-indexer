@@ -1213,4 +1213,68 @@ public partial class Query
         }
         return rarityRankItem;
     }
+
+    [Name("getHomeData")]
+    public static async Task<HomeDataDto> GetHomeDataAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderIndexRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolIndexRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<NFTActivityIndex, LogEventInfo> nftActivityIndexRepository,
+        GetHomeDataInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThanOrEquals(1))
+        };
+        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.Prefix(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+
+        };
+        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+        var schrodingerSymbolCountRes = await symbolIndexRepository.CountAsync(Filter);
+        
+        
+        var mustQuery2 = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0))
+        };
+        var mustNotQuery2 = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.Prefix(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+
+        };
+        QueryContainer Filter2(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
+            f.Bool(b => b.Must(mustQuery2));
+        var schrodingerHolderCountRes = await holderIndexRepository.CountAsync(Filter2);
+
+
+        var querySymbol = input.ChainId == "tDVV" ? "SGR" : "SGRTEST";
+        var mustQuery3 = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>()
+        {
+            q => q.Term(i => i.Field(f => f.Type).Value(NFTActivityType.Sale)),
+            q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(".*"+querySymbol+".*"))
+        };
+        QueryContainer Filter3(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery3));
+        
+        var totalTradeList = await GetAllIndex(Filter3, nftActivityIndexRepository);
+        var totalTradeVolume = totalTradeList.Sum(i => i.Price * i.Amount);
+        var tradeVolumeData = Math.Round(totalTradeVolume, 1);
+
+        return new HomeDataDto
+        {
+            SymbolCount = schrodingerSymbolCountRes.Count,
+            HoldingCount = schrodingerHolderCountRes.Count,
+            TradeVolume = tradeVolumeData
+        };
+    }
 }
