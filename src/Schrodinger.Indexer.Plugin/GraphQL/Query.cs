@@ -281,8 +281,6 @@ public partial class Query
                 IsRare = IsRare(traitType, traitValue)
             });
         }
-
-        traitListWithPercent = traitListWithPercent.OrderByDescending(x => x.IsRare).ThenBy(x => x.TraitType).ToList();
         
         schrodingerDetailDto.Traits = traitListWithPercent;
         return schrodingerDetailDto;
