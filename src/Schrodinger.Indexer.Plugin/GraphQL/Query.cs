@@ -277,9 +277,12 @@ public partial class Query
             {
                 TraitType = traitType,
                 Value = traitValue,
-                Percent = percent
+                Percent = percent,
+                IsRare = IsRare(traitType, traitValue)
             });
         }
+
+        traitListWithPercent = traitListWithPercent.OrderByDescending(x => x.IsRare).ThenBy(x => x.TraitType).ToList();
         
         schrodingerDetailDto.Traits = traitListWithPercent;
         return schrodingerDetailDto;
@@ -470,9 +473,13 @@ public partial class Query
             {
                 TraitType = attr.TraitType,
                 Value = attr.Value,
-                Percent = percent * 100
+                Percent = percent * 100,
+                IsRare = IsRare(attr.TraitType, attr.Value)
+                
             });
         }
+        
+        resp.Attributes = resp.Attributes.OrderByDescending(x => x.IsRare).ThenBy(x => x.TraitType).ToList();
 
         return resp;
     }
@@ -962,4 +969,43 @@ public partial class Query
         return  objectMapper.Map<List<SchrodingerAdoptIndex>, List<AdoptInfoDto>>(result);
     }
 
+
+    private static bool IsRare(string traitType, string traitValue)
+    {
+        var rareType = new List<string>
+        {
+            "Background",
+            "Clothes",
+            "Breed",
+            "Hat",
+            "Eyes",
+            "Pet",
+            "Mouth",
+            "Face",
+            "Necklace",
+            "Paw",
+            "Trousers",
+            "Belt",
+            "Shoes",
+            "Mustache",
+            "Wings",
+            "Tail",
+            "Ride",
+            "Weapon",
+            "Accessory"
+        };
+            
+        string traitsProbabilityMapContent = File.ReadAllText("/app/rankData/TraitDataV8.json");
+        var traitsProbabilityMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(traitsProbabilityMapContent);
+        var traitsProbabilityList = traitsProbabilityMap.ToDictionary(x => x.Key,
+            x => x.Value.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).Take(10).ToList());
+       
+        if (!rareType.Contains(traitType))
+        {
+            return false;
+        }
+
+        var rareValueInType = traitsProbabilityList[traitType];
+        return rareValueInType.Contains(traitValue);
+    }
 }

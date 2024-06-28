@@ -35,4 +35,5 @@ public class Trait
     public string TraitType { get; set; }
     public string Value { get; set; }
     public decimal Percent { get; set; }
+    public bool IsRare { get; set; }
 }
