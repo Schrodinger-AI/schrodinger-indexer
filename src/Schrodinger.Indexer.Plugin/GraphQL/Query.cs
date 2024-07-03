@@ -519,7 +519,8 @@ public partial class Query
             {
                 strayCatDto.ParentTraits = objectMapper.Map<List<TraitInfo>, List<StrayCatTraitsDto>>(parentTraits);
             }
-
+            
+            strayCatDto.DirectAdoption = (schrodingerAdoptIndex.Gen - schrodingerAdoptIndex.ParentGen) > 1;
             strayCatDto.NextSymbol = schrodingerAdoptIndex.Symbol;
             strayCatDto.NextTokenName = schrodingerAdoptIndex.TokenName;
             strayCatDto.NextAmount = schrodingerAdoptIndex.OutputAmount;

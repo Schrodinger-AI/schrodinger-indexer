@@ -20,6 +20,7 @@ public class StrayCatDto
     public string NextTokenName { get; set; }
     public string NextSymbol { get; set; }
     public long NextAmount{ get; set; }
+    public bool DirectAdoption { get; set; }
     
 }
 
