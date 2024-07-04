@@ -1017,20 +1017,12 @@ public partial class Query
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
         {
             q => q.LongRange(i
-                => i.Field(f => f.Amount).GreaterThan(0))
+                => i.Field(f => f.Amount).GreaterThan(0)),
+            q => q.LongRange(i
+            => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
+            q => q.Regexp(i => 
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGRTEST-.*"))
         };
-        
-        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
-        {
-            q => q.Prefix(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
-            q => q.Term(i =>
-            i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
-            
-        };
-        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
         
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
             f.Bool(b => b.Must(mustQuery));
@@ -1073,20 +1065,10 @@ public partial class Query
             q => q.LongRange(i
                 => i.Field(f => f.Amount).GreaterThan(0)),
             q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.Gen).Value(9))
+                i.Field(f => f.SchrodingerInfo.Gen).Value(9)),
+            q => q.Regexp(i => 
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGRTEST-.*"))
         };
-        
-        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
-        {
-            q => q.Prefix(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
-            
-        };
-        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
         
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
             f.Bool(b => b.Must(mustQuery));
