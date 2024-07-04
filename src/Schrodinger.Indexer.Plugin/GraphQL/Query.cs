@@ -1025,7 +1025,9 @@ public partial class Query
             q => q.Prefix(i =>
                 i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
             q => q.Term(i =>
-            i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+            i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
             
         };
         mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
@@ -1079,7 +1081,9 @@ public partial class Query
             q => q.Prefix(i =>
                 i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
             q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
             
         };
         mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
@@ -1232,7 +1236,9 @@ public partial class Query
             q => q.Prefix(i =>
                 i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
             q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
 
         };
         mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
@@ -1251,7 +1257,10 @@ public partial class Query
             q => q.Prefix(i =>
                 i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
             q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR"))
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
+            q => q.Term(i =>
+                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
+            
 
         };
         QueryContainer Filter2(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
