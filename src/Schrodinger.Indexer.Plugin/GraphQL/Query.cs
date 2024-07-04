@@ -1310,4 +1310,42 @@ public partial class Query
         var nftSoldList = await GetAllIndex(Filter, _nftActivityIndexRepository);
         return objectMapper.Map<List<NFTActivityIndex>, List<NFTActivityDto>>(nftSoldList);
     }
+    
+    
+    [Name("getHoldingPointBySymbol")]
+    public static async Task<HoldingPointBySymbolDto> GetHoldingPointBySymbol(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
+        [FromServices] IObjectMapper objectMapper, GetSchrodingerDetailInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.Term(i 
+                => i.Field(f => f.SchrodingerInfo.Symbol).Value(input.Symbol))
+        };
+            
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await symbolRepository.GetAsync(Filter);
+        if (result == null)
+        {
+            return new HoldingPointBySymbolDto();
+        }
+
+        var level = result.Level;
+        var res = new HoldingPointBySymbolDto
+        {
+            Level = level,
+            Point = 9
+        };
+
+        if (!level.IsNullOrEmpty() && LevelConstant.LevelPointDictionary.TryGetValue(level, out var pointOfLevel))
+        {
+            res.Point = pointOfLevel;
+        }
+        
+        return res;
+    }
 }
