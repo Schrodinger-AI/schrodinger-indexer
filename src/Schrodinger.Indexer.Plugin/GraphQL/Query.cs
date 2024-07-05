@@ -1021,7 +1021,7 @@ public partial class Query
             q => q.LongRange(i
             => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
             q => q.Regexp(i => 
-                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGRTEST-.*"))
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
         };
         
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
@@ -1067,7 +1067,7 @@ public partial class Query
             q => q.Term(i =>
                 i.Field(f => f.SchrodingerInfo.Gen).Value(9)),
             q => q.Regexp(i => 
-                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGRTEST-.*"))
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
         };
         
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
@@ -1211,20 +1211,13 @@ public partial class Query
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
         {
             q => q.LongRange(i
-                => i.Field(f => f.Amount).GreaterThanOrEquals(1))
+                => i.Field(f => f.Amount).GreaterThanOrEquals(1)),
+            q => q.LongRange(i
+                => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
+            q => q.Regexp(i => 
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
         };
-        var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
-        {
-            q => q.Prefix(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
-
-        };
-        mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
-
+        
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
             f.Bool(b => b.Must(mustQuery));
 
@@ -1234,24 +1227,16 @@ public partial class Query
         var mustQuery2 = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
         {
             q => q.LongRange(i
-                => i.Field(f => f.Amount).GreaterThan(0))
-        };
-        var mustNotQuery2 = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
-        {
-            q => q.Prefix(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SSGGRRCATTT")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGR")),
-            q => q.Term(i =>
-                i.Field(f => f.SchrodingerInfo.TokenName).Value("SGRTEST"))
+                => i.Field(f => f.Amount).GreaterThan(0)),
+            q => q.Regexp(i => 
+            i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
         };
 
         QueryContainer Filter2(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
             f.Bool(b => b.Must(mustQuery2));
 
         var schrodingerHolderCountRes = await holderIndexRepository.CountAsync(Filter2);
-
-
+        
         var querySymbol = input.ChainId == "tDVV" ? "SGR" : "SGRTEST";
         var mustQuery3 = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>()
         {

@@ -62774,5 +62774,5 @@ public class LevelConstant
         { "3", 115 },
         { "2", 77 },
         { "1", 38 }
-    }
+    };
 }
