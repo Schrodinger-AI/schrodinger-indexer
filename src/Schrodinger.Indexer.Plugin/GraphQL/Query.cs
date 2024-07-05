@@ -1215,7 +1215,9 @@ public partial class Query
             q => q.LongRange(i
                 => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
             q => q.Regexp(i => 
-                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*")),
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId))
         };
         
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
@@ -1229,19 +1231,24 @@ public partial class Query
             q => q.LongRange(i
                 => i.Field(f => f.Amount).GreaterThan(0)),
             q => q.Regexp(i => 
-            i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
+            i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*")),
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId))
         };
 
         QueryContainer Filter2(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
             f.Bool(b => b.Must(mustQuery2));
+        
+        var holderList = await GetAllIndex(Filter2, holderIndexRepository);
+        var uniqueHolderCnt = holderList.GroupBy(i => i.Address).Select(i => i.Key).Count();
 
-        var schrodingerHolderCountRes = await holderIndexRepository.CountAsync(Filter2);
+        // var schrodingerHolderCountRes = await holderIndexRepository.CountAsync(Filter2);
         
         var querySymbol = input.ChainId == "tDVV" ? "SGR" : "SGRTEST";
         var mustQuery3 = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>()
         {
             q => q.Term(i => i.Field(f => f.Type).Value(NFTActivityType.Sale)),
-            q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(".*" + querySymbol + ".*"))
+            q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(input.ChainId + "-" + querySymbol + ".*"))
         };
         QueryContainer Filter3(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery3));
 
@@ -1252,7 +1259,7 @@ public partial class Query
         return new HomeDataDto
         {
             SymbolCount = schrodingerSymbolCountRes.Count,
-            HoldingCount = schrodingerHolderCountRes.Count,
+            HoldingCount = uniqueHolderCnt,
             TradeVolume = tradeVolumeData
         };
     }
