@@ -1211,7 +1211,7 @@ public partial class Query
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerSymbolIndex>, QueryContainer>>
         {
             q => q.LongRange(i
-                => i.Field(f => f.Amount).GreaterThanOrEquals(1)),
+                => i.Field(f => f.Amount).GreaterThanOrEquals(100000000)),
             q => q.LongRange(i
                 => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
             q => q.Regexp(i => 
@@ -1230,6 +1230,8 @@ public partial class Query
         {
             q => q.LongRange(i
                 => i.Field(f => f.Amount).GreaterThan(0)),
+            q => q.LongRange(i
+                => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0)),
             q => q.Regexp(i => 
             i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*")),
             q => q.Term(i
@@ -1241,14 +1243,12 @@ public partial class Query
         
         var holderList = await GetAllIndex(Filter2, holderIndexRepository);
         var uniqueHolderCnt = holderList.GroupBy(i => i.Address).Select(i => i.Key).Count();
-
-        // var schrodingerHolderCountRes = await holderIndexRepository.CountAsync(Filter2);
         
-        var querySymbol = input.ChainId == "tDVV" ? "SGR" : "SGRTEST";
+        
         var mustQuery3 = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>()
         {
             q => q.Term(i => i.Field(f => f.Type).Value(NFTActivityType.Sale)),
-            q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(input.ChainId + "-" + querySymbol + ".*"))
+            q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(input.ChainId + "-SGR-.*"))
         };
         QueryContainer Filter3(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery3));
 
