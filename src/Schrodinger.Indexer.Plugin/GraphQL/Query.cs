@@ -476,8 +476,6 @@ public partial class Query
                 
             });
         }
-        
-        resp.Attributes = resp.Attributes.OrderByDescending(x => x.IsRare).ThenBy(x => x.TraitType).ToList();
 
         return resp;
     }
@@ -1287,12 +1285,17 @@ public partial class Query
                     .LessThan(DateTime.UnixEpoch.AddMilliseconds((double)input.TimestampMax))));
         }
         
-        mustQuery.Add(q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(".*"+input.FilterSymbol+".*")));
-        
+        mustQuery.Add(q => q.Regexp(i => i.Field(f => f.NftInfoId).Value(input.ChainId + "-SGR-.*")));
+
+        var baseTokenList = new List<string>
+        {
+            "tDVW-SGR-1",
+            "tDVV-SGR-1"
+        };
         var mustNotQuery = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>
         {
-            q => q.Term(i =>
-                i.Field(f => f.NftInfoId).Value(input.ChainId+"-"+input.FilterSymbol+"-1"))
+            q => q.Terms(i =>
+                i.Field(f => f.NftInfoId).Terms(baseTokenList))
         };
         
         mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
@@ -1300,6 +1303,7 @@ public partial class Query
         QueryContainer Filter(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery));
         
         var nftSoldList = await GetAllIndex(Filter, _nftActivityIndexRepository);
+        nftSoldList.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
         return objectMapper.Map<List<NFTActivityIndex>, List<NFTActivityDto>>(nftSoldList);
     }
     
@@ -1339,5 +1343,47 @@ public partial class Query
         }
         
         return res;
+    }
+    
+    
+    [Name("getSchrodingerHoldingList")]
+    public static async Task<SchrodingerListDto> GetSchrodingerHoldingListAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> holderRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerAdoptIndex, LogEventInfo> adoptRepository,
+        [FromServices] IObjectMapper objectMapper,
+        GetSchrodingerHoldingListInput input)
+    {
+        var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerHolderIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThanOrEquals(100000000)),
+            q => q.Regexp(i => 
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*")),
+            q => q.LongRange(i
+                => i.Field(f => f.SchrodingerInfo.Gen).GreaterThan(0))
+        };
+        
+        if (!string.IsNullOrEmpty(input.Address))
+        {
+            mustQuery.Add(q => q.Term(i
+                => i.Field(f => f.Address).Value(input.Address)));
+        }
+
+        QueryContainer Filter(QueryContainerDescriptor<SchrodingerHolderIndex> f) =>
+            f.Bool(b => b.Must(mustQuery));
+
+        var result = await holderRepository.GetListAsync(Filter, skip: input.SkipCount,
+            limit: input.MaxResultCount, sortType: SortOrder.Descending, sortExp: o => o.BlockTime);
+        
+        
+        var response = new SchrodingerListDto
+        {
+            TotalCount = result.Item1,
+            Data = objectMapper.Map<List<SchrodingerHolderIndex>, List<SchrodingerDto>>(result.Item2)
+        };
+
+        return response;
     }
 }
