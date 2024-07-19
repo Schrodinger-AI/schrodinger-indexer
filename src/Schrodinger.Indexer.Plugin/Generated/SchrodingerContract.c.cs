@@ -66,6 +66,7 @@ namespace Schrodinger {
         AttributesPerGen = AttributesPerGen,
         Signatory = Signatory,
         ImageUri = ImageUri,
+        MaxGenLossRate = MaxGenLossRate,
       };
     }
   }
@@ -267,6 +268,7 @@ namespace Schrodinger {
         Tick = Tick,
         LossRate = LossRate,
         CommissionRate = CommissionRate,
+        MaxGenLossRate = MaxGenLossRate,
       };
     }
   }
@@ -477,6 +479,64 @@ namespace Schrodinger {
     }
   }
 
+  public partial class ReferralAccepted : aelf::IEvent<ReferralAccepted>
+  {
+    public global::System.Collections.Generic.IEnumerable<ReferralAccepted> GetIndexed()
+    {
+      return new List<ReferralAccepted>
+      {
+      };
+    }
+
+    public ReferralAccepted GetNonIndexed()
+    {
+      return new ReferralAccepted
+      {
+        Referrer = Referrer,
+        Invitee = Invitee,
+      };
+    }
+  }
+
+  public partial class OfficialDomainAliasSet : aelf::IEvent<OfficialDomainAliasSet>
+  {
+    public global::System.Collections.Generic.IEnumerable<OfficialDomainAliasSet> GetIndexed()
+    {
+      return new List<OfficialDomainAliasSet>
+      {
+      };
+    }
+
+    public OfficialDomainAliasSet GetNonIndexed()
+    {
+      return new OfficialDomainAliasSet
+      {
+        Alias = Alias,
+      };
+    }
+  }
+
+  public partial class AdoptionRerolled : aelf::IEvent<AdoptionRerolled>
+  {
+    public global::System.Collections.Generic.IEnumerable<AdoptionRerolled> GetIndexed()
+    {
+      return new List<AdoptionRerolled>
+      {
+      };
+    }
+
+    public AdoptionRerolled GetNonIndexed()
+    {
+      return new AdoptionRerolled
+      {
+        AdoptId = AdoptId,
+        Symbol = Symbol,
+        Amount = Amount,
+        Account = Account,
+      };
+    }
+  }
+
   #endregion
   public static partial class SchrodingerContractContainer
   {
@@ -489,6 +549,8 @@ namespace Schrodinger {
     static readonly aelf::Marshaller<global::Schrodinger.AdoptInput> __Marshaller_AdoptInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AdoptInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.ConfirmInput> __Marshaller_ConfirmInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.ConfirmInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.RerollInput> __Marshaller_RerollInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.RerollInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.AdoptMaxGenInput> __Marshaller_AdoptMaxGenInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AdoptMaxGenInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::AElf.Types.Hash> __Marshaller_aelf_Hash = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::AElf.Types.Hash.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.SetAttributeInput> __Marshaller_SetAttributeInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetAttributeInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.SetAttributesPerGenInput> __Marshaller_SetAttributesPerGenInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetAttributesPerGenInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.SetMaxGenerationInput> __Marshaller_SetMaxGenerationInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetMaxGenerationInput.Parser.ParseFrom);
@@ -501,18 +563,21 @@ namespace Schrodinger {
     static readonly aelf::Marshaller<global::Google.Protobuf.WellKnownTypes.StringValue> __Marshaller_google_protobuf_StringValue = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Google.Protobuf.WellKnownTypes.StringValue.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::AElf.Types.Address> __Marshaller_aelf_Address = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::AElf.Types.Address.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.InscriptionInfo> __Marshaller_InscriptionInfo = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.InscriptionInfo.Parser.ParseFrom);
-    static readonly aelf::Marshaller<global::Schrodinger.AttributeLists> __Marshaller_AttributeLists = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AttributeLists.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.AttributeInfos> __Marshaller_AttributeInfos = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AttributeInfos.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.GetAttributeValuesInput> __Marshaller_GetAttributeValuesInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.GetAttributeValuesInput.Parser.ParseFrom);
-    static readonly aelf::Marshaller<global::AElf.Types.Hash> __Marshaller_aelf_Hash = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::AElf.Types.Hash.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.AdoptInfo> __Marshaller_AdoptInfo = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AdoptInfo.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.GetTokenInfoOutput> __Marshaller_GetTokenInfoOutput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.GetTokenInfoOutput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.Config> __Marshaller_Config = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.Config.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Google.Protobuf.WellKnownTypes.Int32Value> __Marshaller_google_protobuf_Int32Value = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Google.Protobuf.WellKnownTypes.Int32Value.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Google.Protobuf.WellKnownTypes.Int64Value> __Marshaller_google_protobuf_Int64Value = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Google.Protobuf.WellKnownTypes.Int64Value.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.SetAttributeConfigInput> __Marshaller_SetAttributeConfigInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetAttributeConfigInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.SetPointsProportionListInput> __Marshaller_SetPointsProportionListInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetPointsProportionListInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.BatchSettleInput> __Marshaller_BatchSettleInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.BatchSettleInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Schrodinger.JoinInput> __Marshaller_JoinInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.JoinInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.AcceptReferralInput> __Marshaller_AcceptReferralInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.AcceptReferralInput.Parser.ParseFrom);
     static readonly aelf::Marshaller<global::Google.Protobuf.WellKnownTypes.BoolValue> __Marshaller_google_protobuf_BoolValue = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Google.Protobuf.WellKnownTypes.BoolValue.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.TransferFromReceivingAddressInput> __Marshaller_TransferFromReceivingAddressInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.TransferFromReceivingAddressInput.Parser.ParseFrom);
+    static readonly aelf::Marshaller<global::Schrodinger.SetOfficialDomainAliasInput> __Marshaller_SetOfficialDomainAliasInput = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Schrodinger.SetOfficialDomainAliasInput.Parser.ParseFrom);
     #endregion
 
     #region Methods
@@ -549,6 +614,20 @@ namespace Schrodinger {
         __ServiceName,
         "Reroll",
         __Marshaller_RerollInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::Schrodinger.AdoptMaxGenInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_AdoptMaxGen = new aelf::Method<global::Schrodinger.AdoptMaxGenInput, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "AdoptMaxGen",
+        __Marshaller_AdoptMaxGenInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::AElf.Types.Hash, global::Google.Protobuf.WellKnownTypes.Empty> __Method_RerollAdoption = new aelf::Method<global::AElf.Types.Hash, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "RerollAdoption",
+        __Marshaller_aelf_Hash,
         __Marshaller_google_protobuf_Empty);
 
     static readonly aelf::Method<global::Schrodinger.SetAttributeInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_SetFixedAttribute = new aelf::Method<global::Schrodinger.SetAttributeInput, global::Google.Protobuf.WellKnownTypes.Empty>(
@@ -648,13 +727,6 @@ namespace Schrodinger {
         "GetParent",
         __Marshaller_google_protobuf_StringValue,
         __Marshaller_google_protobuf_StringValue);
-
-    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Schrodinger.AttributeLists> __Method_GetAttributes = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Schrodinger.AttributeLists>(
-        aelf::MethodType.View,
-        __ServiceName,
-        "GetAttributes",
-        __Marshaller_google_protobuf_StringValue,
-        __Marshaller_AttributeLists);
 
     static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Schrodinger.AttributeInfos> __Method_GetAttributeTypes = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Schrodinger.AttributeInfos>(
         aelf::MethodType.View,
@@ -768,19 +840,26 @@ namespace Schrodinger {
         __Marshaller_aelf_Address,
         __Marshaller_google_protobuf_Empty);
 
-    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Hash> __Method_GetPointsContractDAppId = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Hash>(
-        aelf::MethodType.View,
-        __ServiceName,
-        "GetPointsContractDAppId",
-        __Marshaller_google_protobuf_Empty,
-        __Marshaller_aelf_Hash);
-
-    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address> __Method_GetPointsContract = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address>(
+    static readonly aelf::Method<global::Schrodinger.SetPointsProportionListInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_SetPointsProportionList = new aelf::Method<global::Schrodinger.SetPointsProportionListInput, global::Google.Protobuf.WellKnownTypes.Empty>(
         aelf::MethodType.Action,
         __ServiceName,
-        "GetPointsContract",
-        __Marshaller_google_protobuf_Empty,
-        __Marshaller_aelf_Address);
+        "SetPointsProportionList",
+        __Marshaller_SetPointsProportionListInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::AElf.Types.Address, global::Google.Protobuf.WellKnownTypes.Empty> __Method_SetPointsSettleAdmin = new aelf::Method<global::AElf.Types.Address, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "SetPointsSettleAdmin",
+        __Marshaller_aelf_Address,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::Schrodinger.BatchSettleInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_BatchSettle = new aelf::Method<global::Schrodinger.BatchSettleInput, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "BatchSettle",
+        __Marshaller_BatchSettleInput,
+        __Marshaller_google_protobuf_Empty);
 
     static readonly aelf::Method<global::Schrodinger.JoinInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_Join = new aelf::Method<global::Schrodinger.JoinInput, global::Google.Protobuf.WellKnownTypes.Empty>(
         aelf::MethodType.Action,
@@ -789,12 +868,75 @@ namespace Schrodinger {
         __Marshaller_JoinInput,
         __Marshaller_google_protobuf_Empty);
 
+    static readonly aelf::Method<global::Schrodinger.AcceptReferralInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_AcceptReferral = new aelf::Method<global::Schrodinger.AcceptReferralInput, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "AcceptReferral",
+        __Marshaller_AcceptReferralInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Hash> __Method_GetPointsContractDAppId = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Hash>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetPointsContractDAppId",
+        __Marshaller_google_protobuf_Empty,
+        __Marshaller_aelf_Hash);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address> __Method_GetPointsContract = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetPointsContract",
+        __Marshaller_google_protobuf_Empty,
+        __Marshaller_aelf_Address);
+
     static readonly aelf::Method<global::AElf.Types.Address, global::Google.Protobuf.WellKnownTypes.BoolValue> __Method_GetJoinRecord = new aelf::Method<global::AElf.Types.Address, global::Google.Protobuf.WellKnownTypes.BoolValue>(
         aelf::MethodType.View,
         __ServiceName,
         "GetJoinRecord",
         __Marshaller_aelf_Address,
         __Marshaller_google_protobuf_BoolValue);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Google.Protobuf.WellKnownTypes.Int64Value> __Method_GetPointsProportion = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Google.Protobuf.WellKnownTypes.Int64Value>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetPointsProportion",
+        __Marshaller_google_protobuf_StringValue,
+        __Marshaller_google_protobuf_Int64Value);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address> __Method_GetPointsSettleAdmin = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::AElf.Types.Address>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetPointsSettleAdmin",
+        __Marshaller_google_protobuf_Empty,
+        __Marshaller_aelf_Address);
+
+    static readonly aelf::Method<global::Schrodinger.TransferFromReceivingAddressInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_TransferFromReceivingAddress = new aelf::Method<global::Schrodinger.TransferFromReceivingAddressInput, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "TransferFromReceivingAddress",
+        __Marshaller_TransferFromReceivingAddressInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::AElf.Types.Address> __Method_GetReceivingAddress = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::AElf.Types.Address>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetReceivingAddress",
+        __Marshaller_google_protobuf_StringValue,
+        __Marshaller_aelf_Address);
+
+    static readonly aelf::Method<global::Schrodinger.SetOfficialDomainAliasInput, global::Google.Protobuf.WellKnownTypes.Empty> __Method_SetOfficialDomainAlias = new aelf::Method<global::Schrodinger.SetOfficialDomainAliasInput, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "SetOfficialDomainAlias",
+        __Marshaller_SetOfficialDomainAliasInput,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::Google.Protobuf.WellKnownTypes.StringValue> __Method_GetOfficialDomainAlias = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::Google.Protobuf.WellKnownTypes.StringValue>(
+        aelf::MethodType.View,
+        __ServiceName,
+        "GetOfficialDomainAlias",
+        __Marshaller_google_protobuf_Empty,
+        __Marshaller_google_protobuf_StringValue);
 
     #endregion
 
@@ -816,258 +958,6 @@ namespace Schrodinger {
       }
     }
     #endregion
-
-    /// <summary>Base class for the contract of SchrodingerContract</summary>
-    // public abstract partial class SchrodingerContractBase : AElf.Sdk.CSharp.CSharpSmartContract<Schrodinger.SchrodingerContractState>
-    // {
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Initialize(global::Schrodinger.InitializeInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Deploy(global::Schrodinger.DeployInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Adopt(global::Schrodinger.AdoptInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Confirm(global::Schrodinger.ConfirmInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Reroll(global::Schrodinger.RerollInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetFixedAttribute(global::Schrodinger.SetAttributeInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetRandomAttribute(global::Schrodinger.SetAttributeInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetAttributesPerGen(global::Schrodinger.SetAttributesPerGenInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetMaxGeneration(global::Schrodinger.SetMaxGenerationInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetRates(global::Schrodinger.SetRatesInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetRecipient(global::Schrodinger.SetRecipientInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetImageCount(global::Schrodinger.SetImageCountInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetInscriptionAdmin(global::Schrodinger.SetInscriptionAdminInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetCrossGenerationConfig(global::Schrodinger.SetCrossGenerationConfigInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetSignatory(global::Schrodinger.SetSignatoryInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::AElf.Types.Address GetSignatory(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.InscriptionInfo GetInscriptionInfo(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.StringValue GetTick(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.StringValue GetParent(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.AttributeLists GetAttributes(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.AttributeInfos GetAttributeTypes(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.AttributeInfos GetAttributeValues(global::Schrodinger.GetAttributeValuesInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.AdoptInfo GetAdoptInfo(global::AElf.Types.Hash input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.GetTokenInfoOutput GetTokenInfo(global::Google.Protobuf.WellKnownTypes.StringValue input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetConfig(global::Schrodinger.Config input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetAdmin(global::AElf.Types.Address input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::AElf.Types.Address GetAdmin(global::Google.Protobuf.WellKnownTypes.Empty input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetMaxGenerationConfig(global::Google.Protobuf.WellKnownTypes.Int32Value input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetImageMaxSize(global::Google.Protobuf.WellKnownTypes.Int64Value input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetImageMaxCount(global::Google.Protobuf.WellKnownTypes.Int64Value input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetAttributeConfig(global::Schrodinger.SetAttributeConfigInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Schrodinger.Config GetConfig(global::Google.Protobuf.WellKnownTypes.Empty input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetImageUriMaxSize(global::Google.Protobuf.WellKnownTypes.Int64Value input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Int64Value GetImageUriMaxSize(global::Google.Protobuf.WellKnownTypes.Empty input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetPointsContractDAppId(global::AElf.Types.Hash input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty SetPointsContract(global::AElf.Types.Address input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::AElf.Types.Hash GetPointsContractDAppId(global::Google.Protobuf.WellKnownTypes.Empty input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::AElf.Types.Address GetPointsContract(global::Google.Protobuf.WellKnownTypes.Empty input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.Empty Join(global::Schrodinger.JoinInput input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    //   public virtual global::Google.Protobuf.WellKnownTypes.BoolValue GetJoinRecord(global::AElf.Types.Address input)
-    //   {
-    //     throw new global::System.NotImplementedException();
-    //   }
-    //
-    // }
-    //
-    // public static aelf::ServerServiceDefinition BindService(SchrodingerContractBase serviceImpl)
-    // {
-    //   return aelf::ServerServiceDefinition.CreateBuilder()
-    //       .AddDescriptors(Descriptors)
-    //       .AddMethod(__Method_Initialize, serviceImpl.Initialize)
-    //       .AddMethod(__Method_Deploy, serviceImpl.Deploy)
-    //       .AddMethod(__Method_Adopt, serviceImpl.Adopt)
-    //       .AddMethod(__Method_Confirm, serviceImpl.Confirm)
-    //       .AddMethod(__Method_Reroll, serviceImpl.Reroll)
-    //       .AddMethod(__Method_SetFixedAttribute, serviceImpl.SetFixedAttribute)
-    //       .AddMethod(__Method_SetRandomAttribute, serviceImpl.SetRandomAttribute)
-    //       .AddMethod(__Method_SetAttributesPerGen, serviceImpl.SetAttributesPerGen)
-    //       .AddMethod(__Method_SetMaxGeneration, serviceImpl.SetMaxGeneration)
-    //       .AddMethod(__Method_SetRates, serviceImpl.SetRates)
-    //       .AddMethod(__Method_SetRecipient, serviceImpl.SetRecipient)
-    //       .AddMethod(__Method_SetImageCount, serviceImpl.SetImageCount)
-    //       .AddMethod(__Method_SetInscriptionAdmin, serviceImpl.SetInscriptionAdmin)
-    //       .AddMethod(__Method_SetCrossGenerationConfig, serviceImpl.SetCrossGenerationConfig)
-    //       .AddMethod(__Method_SetSignatory, serviceImpl.SetSignatory)
-    //       .AddMethod(__Method_GetSignatory, serviceImpl.GetSignatory)
-    //       .AddMethod(__Method_GetInscriptionInfo, serviceImpl.GetInscriptionInfo)
-    //       .AddMethod(__Method_GetTick, serviceImpl.GetTick)
-    //       .AddMethod(__Method_GetParent, serviceImpl.GetParent)
-    //       .AddMethod(__Method_GetAttributes, serviceImpl.GetAttributes)
-    //       .AddMethod(__Method_GetAttributeTypes, serviceImpl.GetAttributeTypes)
-    //       .AddMethod(__Method_GetAttributeValues, serviceImpl.GetAttributeValues)
-    //       .AddMethod(__Method_GetAdoptInfo, serviceImpl.GetAdoptInfo)
-    //       .AddMethod(__Method_GetTokenInfo, serviceImpl.GetTokenInfo)
-    //       .AddMethod(__Method_SetConfig, serviceImpl.SetConfig)
-    //       .AddMethod(__Method_SetAdmin, serviceImpl.SetAdmin)
-    //       .AddMethod(__Method_GetAdmin, serviceImpl.GetAdmin)
-    //       .AddMethod(__Method_SetMaxGenerationConfig, serviceImpl.SetMaxGenerationConfig)
-    //       .AddMethod(__Method_SetImageMaxSize, serviceImpl.SetImageMaxSize)
-    //       .AddMethod(__Method_SetImageMaxCount, serviceImpl.SetImageMaxCount)
-    //       .AddMethod(__Method_SetAttributeConfig, serviceImpl.SetAttributeConfig)
-    //       .AddMethod(__Method_GetConfig, serviceImpl.GetConfig)
-    //       .AddMethod(__Method_SetImageUriMaxSize, serviceImpl.SetImageUriMaxSize)
-    //       .AddMethod(__Method_GetImageUriMaxSize, serviceImpl.GetImageUriMaxSize)
-    //       .AddMethod(__Method_SetPointsContractDAppId, serviceImpl.SetPointsContractDAppId)
-    //       .AddMethod(__Method_SetPointsContract, serviceImpl.SetPointsContract)
-    //       .AddMethod(__Method_GetPointsContractDAppId, serviceImpl.GetPointsContractDAppId)
-    //       .AddMethod(__Method_GetPointsContract, serviceImpl.GetPointsContract)
-    //       .AddMethod(__Method_Join, serviceImpl.Join)
-    //       .AddMethod(__Method_GetJoinRecord, serviceImpl.GetJoinRecord).Build();
-    // }
-
   }
 }
 #endregion

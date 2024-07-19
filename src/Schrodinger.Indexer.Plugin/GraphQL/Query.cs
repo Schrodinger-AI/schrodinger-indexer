@@ -484,15 +484,35 @@ public partial class Query
     public static async Task<StrayCatListDto> GetStrayCatsAsync(
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerAdoptIndex, LogEventInfo> repository,
         [FromServices] IAElfIndexerClientEntityRepository<SchrodingerSymbolIndex, LogEventInfo> symbolRepository,
+        [FromServices] IAElfIndexerClientEntityRepository<SchrodingerCancelIndex, LogEventInfo> cancelRepository,
         [FromServices] IObjectMapper objectMapper,
         StrayCatInput input)
     {
         if (input == null || string.IsNullOrEmpty(input.Adopter))
             throw new UserFriendlyException("Invalid input");
         
+        var cancelMustQuery = new List<Func<QueryContainerDescriptor<SchrodingerCancelIndex>, QueryContainer>>
+        {
+            q => q.Term(f => f.Field(f => f.From).Value(input.Adopter)),
+            q => q.Term(f => f.Field(f => f.ChainId).Value(input.ChainId))
+        };
+        QueryContainer CancelFilter(QueryContainerDescriptor<SchrodingerCancelIndex> f) => f.Bool(b => b.Must(cancelMustQuery));
+        var cancelledAdoptionList = await GetAllIndex(CancelFilter, cancelRepository);
+        var cancelledAdoptIdList = cancelledAdoptionList.Select(c => c.AdoptId).ToList();
+        
         var mustQuery = new List<Func<QueryContainerDescriptor<SchrodingerAdoptIndex>, QueryContainer>>();
         mustQuery.Add(q => q.Term(f => f.Field(f => f.Adopter).Value(input.Adopter)));
         mustQuery.Add(q => q.Term(f => f.Field(f => f.IsConfirmed).Value(false)));
+
+        if (!cancelledAdoptIdList.IsNullOrEmpty())
+        {
+            var mustNotQuery = new List<Func<QueryContainerDescriptor<SchrodingerAdoptIndex>, QueryContainer>>
+            {
+                q => q.Terms(f => f.Field(f => f.AdoptId).Terms(cancelledAdoptIdList))
+            };
+            mustQuery.Add(q => q.Bool(b => b.MustNot(mustNotQuery)));
+        }
+       
         QueryContainer Filter(QueryContainerDescriptor<SchrodingerAdoptIndex> f) => f.Bool(b => b.Must(mustQuery));
         
         var result = await repository.GetListAsync(Filter, skip: input.SkipCount,
