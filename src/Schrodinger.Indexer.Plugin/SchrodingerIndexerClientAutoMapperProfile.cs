@@ -17,6 +17,7 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
         CreateMap<LogEventContext, SchrodingerSymbolIndex>();
         CreateMap<LogEventContext, SchrodingerAdoptIndex>();
         CreateMap<LogEventContext, SchrodingerResetIndex>();
+        CreateMap<LogEventContext, SchrodingerCancelIndex>();
         CreateMap<LogEventContext, NFTActivityIndex>();
 
         CreateMap<NFTActivityIndex, NFTActivityDto>();
@@ -165,7 +166,9 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
             ;
         CreateMap<TraitInfo, TraitDto>();
         CreateMap<Rerolled, SchrodingerResetIndex>();
-        
+        CreateMap<AdoptionRerolled, SchrodingerCancelIndex>()
+            .ForMember(des => des.AdoptId, opt
+                => opt.MapFrom(source => MapHash(source.AdoptId)));
         
         CreateMap<SchrodingerAdoptIndex, StrayCatDto>()
             .ForMember(des => des.InscriptionImageUri, opt
