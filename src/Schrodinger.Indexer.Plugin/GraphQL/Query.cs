@@ -405,7 +405,9 @@ public partial class Query
                 q => q.LongRange(i
                     => i.Field(f => f.HolderCount).GreaterThan(0)),
                 q => q.Term(i
-                    => i.Field(f => f.ChainId).Value(input.ChainId))
+                    => i.Field(f => f.ChainId).Value(input.ChainId)),
+                q => q.Regexp(i => 
+                    i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
             };
             QueryContainer traitsCountFilter(QueryContainerDescriptor<SchrodingerSymbolIndex> f) =>
                 f.Bool(b => b.Must(traitsCountMustQuery));
@@ -748,9 +750,21 @@ public partial class Query
         {
             q => q.Term(i
                 => i.Field(f => f.ChainId).Value(input.ChainId)),
-            q => q.LongRange(i
-                => i.Field(f => f.Amount).GreaterThan(0))
+            q => q.Regexp(i => 
+                i.Field(f => f.SchrodingerInfo.Symbol).Value("SGR-.*"))
         };
+        
+        var minAmount = input.MinAmount.IsNullOrEmpty() ? 0 : long.Parse(input.MinAmount);
+        if (minAmount > 0)
+        {
+            mustQuery.Add(q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThanOrEquals(minAmount)));
+        }
+        else
+        {
+            mustQuery.Add(q => q.LongRange(i
+                => i.Field(f => f.Amount).GreaterThan(0)));
+        }
         
         if (input.FilterSgr)
         {
@@ -1405,5 +1419,33 @@ public partial class Query
         };
 
         return response;
+    }
+    
+    [Name("getSchrodingerTradeRecord")]
+    public static async Task<List<NFTActivityDto>> GetSchrodingerTradeRecordAsync(
+        [FromServices] IAElfIndexerClientEntityRepository<NFTActivityIndex, LogEventInfo> _nftActivityIndexRepository,
+        GetSchrodingerTradeRecordInput input, [FromServices] IObjectMapper objectMapper)
+    {
+        var nftId = input.ChainId + "-" + input.Symbol;
+        var to = input.Buyer;
+        var mustQuery = new List<Func<QueryContainerDescriptor<NFTActivityIndex>, QueryContainer>>
+        {
+            q => q.Term(i
+                => i.Field(f => f.ChainId).Value(input.ChainId)),
+            q => q.Term(i 
+                => i.Field(f => f.To).Value(to)),
+            q => q.Term(i 
+                => i.Field(f => f.NftInfoId).Value(nftId)),
+            q => q.Term(i 
+                => i.Field(f => f.Type).Value(NFTActivityType.Sale)),
+            q => q.DateRange(i =>
+                i.Field(f => f.Timestamp).LessThanOrEquals(input.TradeTime))
+        };
+
+        QueryContainer Filter(QueryContainerDescriptor<NFTActivityIndex> f) => f.Bool(b => b.Must(mustQuery));
+        
+        var nftSoldList = await GetAllIndex(Filter, _nftActivityIndexRepository);
+        nftSoldList.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+        return objectMapper.Map<List<NFTActivityIndex>, List<NFTActivityDto>>(nftSoldList);
     }
 }

@@ -11,6 +11,7 @@ public class GetAllSchrodingerListInput
     public int MaxResultCount { get; set; }
     public string Keyword { get; set; }
     public bool FilterSgr { get; set; }
+    public string MinAmount { get; set; } 
 }
 
 public class TraitsInput
