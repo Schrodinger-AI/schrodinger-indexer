@@ -127,6 +127,18 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
             .ForMember(des => des.Adopter, opt
                 => opt.MapFrom(source => MapAddress(source.Adopter)))
             ;
+        
+        CreateMap<AdoptionUpdated, SchrodingerAdoptIndex>()
+            .ForMember(des => des.Tick, opt
+                => opt.MapFrom(source => TokenSymbolHelper.GetTickBySymbol(source.Symbol)))
+            .ForMember(des => des.Attributes, opt
+                => opt.MapFrom(source => AdoptUpdateMapAttributes(source)))
+            .ForMember(des => des.AdoptId, opt
+                => opt.MapFrom(source => MapHash(source.AdoptId)))
+            .ForMember(des => des.Adopter, opt
+                => opt.MapFrom(source => MapAddress(source.Adopter)))
+            ;
+        
         CreateMap<Attributes, Attribute>();
         CreateMap<Confirmed, SchrodingerAdoptIndex>()
             .ForMember(des => des.Tick, opt
@@ -141,8 +153,8 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
                 => opt.MapFrom(source => MapAddress(source.Deployer)))
             .ForMember(des => des.Attributes, opt
                 => opt.MapFrom(source => MapAttributes(source)))
-            .ForMember(des => des.AdoptExternalInfo, opt
-                => opt.MapFrom(source => MapExternalInfo(source.ExternalInfos.Value)))
+            // .ForMember(des => des.AdoptExternalInfo, opt
+            //     => opt.MapFrom(source => MapExternalInfo(source.ExternalInfos.Value)))
             .ForMember(des => des.InscriptionImageUri, opt
                 => opt.MapFrom(source => source.ImageUri))
             ;
@@ -185,6 +197,16 @@ public class SchrodingerIndexerClientAutoMapperProfile : IndexerMapperBase
                 => opt.MapFrom(source => source.ParentInfo.Gen))
             .ForMember(des => des.Decimals, opt
                 => opt.MapFrom(source => source.ParentInfo.Decimals))
+            ;
+        
+        CreateMap<SchrodingerAdoptIndex, BlindBoxDto>()
+            .ForMember(des => des.Amount, opt
+                => opt.MapFrom(source => source.OutputAmount))
+            .ForMember(des => des.ConsumeAmount, opt
+                => opt.MapFrom(source => source.InputAmount))
+            .ForMember(des => des.Decimals, opt
+                => opt.MapFrom(source => source.ParentInfo.Decimals))
+            .ForMember(t => t.AdoptTime, m => m.Ignore())
             ;
         
         CreateMap<TraitInfo, StrayCatTraitsDto>();

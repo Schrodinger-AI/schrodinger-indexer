@@ -33,6 +33,7 @@ public class SchrodingerIndexerPluginModule : AElfIndexerClientPluginBaseModule<
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, AdoptionRerolledProcessor>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, FixedAttributesSetLogEventProcessor>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, RandomAttributesSetLogEventProcessor>();
+        serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, AdoptionUpdatedProcessor>();
         //swap token
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, TokenCreatedLogEventProcessor>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<LogEventInfo>, TokenCreatedLogEventProcessor2>();

@@ -21,7 +21,7 @@ public class StrayCatDto
     public string NextSymbol { get; set; }
     public long NextAmount{ get; set; }
     public bool DirectAdoption { get; set; }
-    
+    public DateTime AdoptTime { get; set; }
 }
 
 public class StrayCatTraitsDto

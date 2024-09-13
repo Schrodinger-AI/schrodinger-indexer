@@ -3,20 +3,17 @@ using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Orleans.Runtime;
 using Schrodinger.Indexer.Plugin.Entities;
 using Schrodinger.Indexer.Plugin.Processors.Provider;
 using Volo.Abp.ObjectMapping;
 
-
 namespace Schrodinger.Indexer.Plugin.Processors;
 
-public class SchrodingerAdoptProcessor : SchrodingerProcessorBase<Adopted>
+public class AdoptionUpdatedProcessor : SchrodingerProcessorBase<AdoptionUpdated>
 {
     private readonly IRankProvider _rankProvider;
     
-    public SchrodingerAdoptProcessor(ILogger<SchrodingerProcessorBase<Adopted>> logger,
+    public AdoptionUpdatedProcessor(ILogger<SchrodingerProcessorBase<AdoptionUpdated>> logger,
         IObjectMapper objectMapper, IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IAElfIndexerClientEntityRepository<SchrodingerHolderIndex, LogEventInfo> schrodingerHolderRepository,
         IAElfIndexerClientEntityRepository<SchrodingerIndex, LogEventInfo> schrodingerRepository,
@@ -29,23 +26,23 @@ public class SchrodingerAdoptProcessor : SchrodingerProcessorBase<Adopted>
     {
         _rankProvider = rankProvider;
     }
-
-    protected override async Task HandleEventAsync(Adopted adopted, LogEventContext context)
+    
+    protected override async Task HandleEventAsync(AdoptionUpdated adopted, LogEventContext context)
     {
         var chainId = context.ChainId;
         var symbol = adopted.Symbol;
         var adoptId = adopted.AdoptId?.ToHex();
         var parent = adopted.Parent;
-        Logger.LogInformation("[Adopted] start chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId,
+        Logger.LogInformation("[AdoptionUpdated] start chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId,
             symbol, adoptId, parent);
         try
         {
-            var adopt = ObjectMapper.Map<Adopted, SchrodingerAdoptIndex>(adopted);
+            var adopt = ObjectMapper.Map<AdoptionUpdated, SchrodingerAdoptIndex>(adopted);
 
             adopt.Id = IdGenerateHelper.GetId(chainId, symbol);
             adopt.AdoptTime = context.BlockTime;
          
-            adopt.ParentInfo = await GetSchrodingerInfo(chainId, parent);
+            adopt.ParentInfo = await GetParentInfo(chainId, parent);
             // adopt.SchrodingerInfo = await GetSchrodingerInfo(chainId, symbol);
             ObjectMapper.Map(context, adopt);
 
@@ -67,12 +64,12 @@ public class SchrodingerAdoptProcessor : SchrodingerProcessorBase<Adopted>
             }
 
             await SchrodingerAdoptRepository.AddOrUpdateAsync(adopt);
-            Logger.LogInformation("[Adopted] end chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId, symbol,
+            Logger.LogInformation("[AdoptionUpdated] end chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId, symbol,
                 adoptId, parent);
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "[Adopted] Exception chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId,
+            Logger.LogError(e, "[AdoptionUpdated] Exception chainId:{chainId} symbol:{symbol}, adoptId:{adoptId}, parent:{parent}", chainId,
                 symbol,
                 adoptId, parent);
             throw;
@@ -101,5 +98,24 @@ public class SchrodingerAdoptProcessor : SchrodingerProcessorBase<Adopted>
         traitsGenOne.Add(genOneTraitValue);
         traitsGenTwoToNine.Add(genTwoTraitType);
         traitsGenTwoToNine.Add(genTwoTraitValue);
+    }
+    
+    private async Task<SchrodingerInfo> GetParentInfo(string chainId, string symbol)
+    {
+        var indexId = IdGenerateHelper.GetId(chainId, symbol);
+        var parentAdoptIndex = await SchrodingerAdoptRepository.GetFromBlockStateSetAsync(indexId, chainId);
+        // return symbolIndex?.SchrodingerInfo ?? new SchrodingerInfo();
+        if (parentAdoptIndex == null)
+        {
+            return new SchrodingerInfo();
+        }
+        return new SchrodingerInfo
+        {
+            Symbol = symbol,
+            Gen = parentAdoptIndex.Gen,
+            Decimals = 8,
+            TokenName = parentAdoptIndex.TokenName,
+            Tick = parentAdoptIndex.Tick
+        };
     }
 }
