@@ -537,6 +537,38 @@ namespace Schrodinger {
     }
   }
 
+  public partial class AdoptionUpdated : aelf::IEvent<AdoptionUpdated>
+  {
+    public global::System.Collections.Generic.IEnumerable<AdoptionUpdated> GetIndexed()
+    {
+      return new List<AdoptionUpdated>
+      {
+      };
+    }
+
+    public AdoptionUpdated GetNonIndexed()
+    {
+      return new AdoptionUpdated
+      {
+        AdoptId = AdoptId,
+        Parent = Parent,
+        ParentGen = ParentGen,
+        InputAmount = InputAmount,
+        LossAmount = LossAmount,
+        CommissionAmount = CommissionAmount,
+        OutputAmount = OutputAmount,
+        ImageCount = ImageCount,
+        Adopter = Adopter,
+        BlockHeight = BlockHeight,
+        Attributes = Attributes,
+        Gen = Gen,
+        Ancestor = Ancestor,
+        Symbol = Symbol,
+        TokenName = TokenName,
+      };
+    }
+  }
+
   #endregion
   public static partial class SchrodingerContractContainer
   {
@@ -627,6 +659,13 @@ namespace Schrodinger {
         aelf::MethodType.Action,
         __ServiceName,
         "RerollAdoption",
+        __Marshaller_aelf_Hash,
+        __Marshaller_google_protobuf_Empty);
+
+    static readonly aelf::Method<global::AElf.Types.Hash, global::Google.Protobuf.WellKnownTypes.Empty> __Method_UpdateAdoption = new aelf::Method<global::AElf.Types.Hash, global::Google.Protobuf.WellKnownTypes.Empty>(
+        aelf::MethodType.Action,
+        __ServiceName,
+        "UpdateAdoption",
         __Marshaller_aelf_Hash,
         __Marshaller_google_protobuf_Empty);
 

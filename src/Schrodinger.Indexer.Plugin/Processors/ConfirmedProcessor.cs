@@ -45,8 +45,18 @@ public class ConfirmedProcessor : SchrodingerProcessorBase<Confirmed>
                 adoptIndex = ObjectMapper.Map<Confirmed, SchrodingerAdoptIndex>(eventValue);
                 adoptIndex.Id = adoptIndexId;
             }
-
+            
             adoptIndex.IsConfirmed = true;
+
+            if (!eventValue.ExternalInfos.Value.IsNullOrEmpty())
+            {
+                foreach (var item in eventValue.ExternalInfos.Value)
+                {
+                    adoptIndex.AdoptExternalInfo[item.Key] = item.Value;
+                } 
+            }
+            
+            
             await SaveIndexAsync(adoptIndex, context);
             Logger.LogDebug("[Confirmed] end chainId:{chainId} symbol:{symbol}, owner:{owner}", chainId, symbol, owner);
         }

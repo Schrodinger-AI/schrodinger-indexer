@@ -37,6 +37,11 @@ public class IndexerMapperBase : Profile
     {
         return MapAttributes(eventValue.Attributes);
     }
+    
+    protected static List<Entities.Attribute> AdoptUpdateMapAttributes(AdoptionUpdated eventValue)
+    {
+        return MapAttributes(eventValue.Attributes);
+    }
 
 
     protected static List<Entities.Attribute> MapAttributes(Attributes eventValue)
